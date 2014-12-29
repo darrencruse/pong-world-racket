@@ -157,6 +157,36 @@
 ;; the left and right players score 
 (define-struct pong-world [status ball left-paddle right-paddle left-score right-score])
 
+;;
+;; main entry point
+;;
+;; start the game by evaluating in drracket:
+;;   (main initial-state)
+;;
+;; or from the command line:
+;; $ racket
+;; > (enter! "pong-world.rkt")
+;; > (main initial-state)
+;;
+(define (main world)
+  (if SHOW-PAD
+    (big-bang world
+            [name "Pong World"]
+            [on-tick handle-tick]
+            [to-draw draw-pong-world]
+            [on-pad handle-key-down]
+            [on-release handle-key-up]
+            [on-mouse handle-mouse]
+            [stop-when quitting? draw-goodbye])
+    (big-bang world
+            [name "Pong World"]
+            [on-tick handle-tick]
+            [to-draw draw-pong-world]
+            [on-key handle-key-down]
+            [on-release handle-key-up]
+            [on-mouse handle-mouse]
+            [stop-when quitting? draw-goodbye])))
+
 (define (move-coord current dir speed)
   ;; round to hold coordinates to simple integers
   (round (+ current (* dir speed))))
@@ -379,25 +409,6 @@
                         0
                         0))
                         
-(define (main world)
-  (if SHOW-PAD
-    (big-bang world
-            [name "Pong World"]
-            [on-tick handle-tick]
-            [to-draw draw-pong-world]
-            [on-pad handle-key-down]
-            [on-release handle-key-up]
-            [on-mouse handle-mouse]
-            [stop-when quitting? draw-goodbye])
-    (big-bang world
-            [name "Pong World"]
-            [on-tick handle-tick]
-            [to-draw draw-pong-world]
-            [on-key handle-key-down]
-            [on-release handle-key-up]
-            [on-mouse handle-mouse]
-            [stop-when quitting? draw-goodbye])))
- 
 (define (quitting? world)
   (eq? (pong-world-status world) "quitting"))
 
@@ -535,6 +546,7 @@ PLAYFIELD-BG))
         (set-left-paddle world (stop-paddle (pong-world-left-paddle world)))]
     [(or (key=? a-key "up") (key=? a-key "down")) 
         (set-right-paddle world (stop-paddle (pong-world-right-paddle world)))]
+    ;; not sure why but escape didn't work (on mac at least) in handle-key-down
     [(key=? a-key "escape") 
         (pong-world-set-status world "quitting")]
     [(key=? a-key " ")
@@ -578,6 +590,3 @@ PLAYFIELD-BG))
   (if SHOW-DEBUG-MSGS
     (or (string? (write-file 'stdout msg)) true)
     true))
-
-(main initial-state)
-
