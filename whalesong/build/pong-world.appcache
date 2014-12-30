@@ -1,0 +1,12 @@
+CACHE MANIFEST
+## Timestamp: Monday, December 29th, 2014 9:10:49pm
+pong-world.js
+pong-world_1.js
+optimer-normal-normal.js
+canvas.text.js
+excanvas.js
+pong-world-module-manifest.js
+
+# All other resources (e.g. sites) require the user to be online.
+NETWORK:
+*
