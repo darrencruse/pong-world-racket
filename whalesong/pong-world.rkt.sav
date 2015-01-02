@@ -152,20 +152,20 @@
 ;; main entry point
 ;;
 ;; start the game by evaluating in drracket:
-;;   (main initial-world)
+;;   (main initial-state)
 ;;
 ;; or from the command line:
 ;; $ racket
 ;; > (enter! "pong-world.rkt")
-;; > (main initial-world)
+;; > (main initial-state)
 ;;
 (define (main world)
   (big-bang world
     [on-tick handle-tick]
     [to-draw draw-pong-world]
     [on-key handle-key-down]
-;; I have submitted a pull request for adding on-release to whalesong
-    [on-release handle-key-up]
+;; whalesong doesn't handle on-release it seems(?)
+;;    [on-release handle-key-up]
     [on-mouse handle-mouse]
     ;; whalesong doesn't support the second argument to stop-when (I'd done "draw-goodbye")
     [stop-when quitting?]))
@@ -380,7 +380,7 @@
      (make-direction initial-dx 0)
      INITIAL-SPEED))
                                 
-(define initial-world (make-pong-world 
+(define initial-state (make-pong-world 
                         "left-player-serves"
                         (serve-ball 0.5)
                         (make-paddle (make-posn MARGIN (- CENTER-VERT (/ PADDLE-HEIGHT 2))) 
@@ -552,39 +552,60 @@ PLAYFIELD-BG))
     (pong-world-left-score world)
     (pong-world-right-score world))) 
 
+;; since whalesong doesn't support on-release I've made the below stop the paddle
+;; movement when the user taps their up or down key a second time.
 (define (handle-key-down world a-key)
   (cond
     [(key=? a-key "w")
-        (set-left-paddle world (set-paddle-moving (pong-world-left-paddle world) UP-DIR PADDLE-SPEED))]
+      (if (eq? 0 (paddle-speed (pong-world-left-paddle world))) 
+        (set-left-paddle world (set-paddle-moving (pong-world-left-paddle world) UP-DIR PADDLE-SPEED))
+        (set-left-paddle world (stop-paddle (pong-world-left-paddle world))))]
     [(key=? a-key "s")
-        (set-left-paddle world (set-paddle-moving (pong-world-left-paddle world) DOWN-DIR PADDLE-SPEED))]
+      (if (eq? 0 (paddle-speed (pong-world-left-paddle world))) 
+        (set-left-paddle world (set-paddle-moving (pong-world-left-paddle world) DOWN-DIR PADDLE-SPEED))
+        (set-left-paddle world (stop-paddle (pong-world-left-paddle world))))]
     [(key=? a-key "up")
-        (set-right-paddle world (set-paddle-moving (pong-world-right-paddle world) UP-DIR PADDLE-SPEED))]
+      (if (eq? 0 (paddle-speed (pong-world-right-paddle world)))  
+        (set-right-paddle world (set-paddle-moving (pong-world-right-paddle world) UP-DIR PADDLE-SPEED))
+        (set-right-paddle world (stop-paddle (pong-world-right-paddle world))))]
     [(key=? a-key "down")
-        (set-right-paddle world (set-paddle-moving (pong-world-right-paddle world) DOWN-DIR PADDLE-SPEED))]
-    [else world]))
-
-(define (handle-key-up world a-key)
-  (cond
-    [(or (key=? a-key "w") (key=? a-key "s"))
-        (set-left-paddle world (stop-paddle (pong-world-left-paddle world)))]
-    [(or (key=? a-key "up") (key=? a-key "down"))
-        (set-right-paddle world (stop-paddle (pong-world-right-paddle world)))]
-    ;; not sure why but escape didn't work (on mac at least) in handle-key-down
-    [(key=? a-key "escape")
+      (if (eq? 0 (paddle-speed (pong-world-right-paddle world))) 
+        (set-right-paddle world (set-paddle-moving (pong-world-right-paddle world) DOWN-DIR PADDLE-SPEED))
+        (set-right-paddle world (stop-paddle (pong-world-right-paddle world))))]
+    ;; add escape and space here since whalesong doesn't seem to support on-release
+    [(key=? a-key "escape") 
         (pong-world-set-status world "quitting")]
     [(key=? a-key " ")
-        (cond
+        (cond 
           [(eq? (pong-world-status world) "in-play") world]
           [(or (eq? (pong-world-status world) "left-player-serves")
                (eq? (pong-world-status world) "right-player-serves"))
             (serve world)]
-          [else initial-world])]
+          [else initial-state])]
     [else world]))
 
-#|
-PLAY AGAINST YOURSELF WITH MOUSE -
-CAN I PRESERVE THIS AS AN OPTION?
+;; whalesong's big-bang doesn't seem to support on-release?
+;; I wonder how hard it would be to add?  
+;; (the paddle movement is pretty painful without it) 
+(define (handle-key-up world a-key)
+  (cond
+    [(or (key=? a-key "w") (key=? a-key "s")) 
+        (set-left-paddle world (stop-paddle (pong-world-left-paddle world)))]
+    [(or (key=? a-key "up") (key=? a-key "down")) 
+        (set-right-paddle world (stop-paddle (pong-world-right-paddle world)))]
+    ;; not sure why but escape didn't work (on mac at least) in handle-key-down
+    [(key=? a-key "escape") 
+        (pong-world-set-status world "quitting")]
+    [(key=? a-key " ")
+        (cond 
+          [(eq? (pong-world-status world) "in-play") world]
+          [(or (eq? (pong-world-status world) "left-player-serves")
+               (eq? (pong-world-status world) "right-player-serves"))
+            (serve world)]
+          [else initial-state])]
+    [else world]))
+
+
 ;; Added mouse handling as an experiment since racket will run on windows tablets
 ;; And touch events do come through as mouse events
 ;; Unfortunately it's not multi-touch so things don't work well if both players
@@ -595,7 +616,7 @@ CAN I PRESERVE THIS AS AN OPTION?
      (cond 
         [(or (eq? (pong-world-status world) "left-player-won")
              (eq? (pong-world-status world) "right-player-won"))
-           initial-world]
+           initial-state]
         [(and (eq? (pong-world-status world) "left-player-serves")
               (< x CENTER-HORZ))
            (serve world)] 
@@ -610,33 +631,6 @@ CAN I PRESERVE THIS AS AN OPTION?
                 (make-paddle (make-posn MARGIN (min y (- BOTTOM PADDLE-HEIGHT 2))) 
                   (make-direction 0 1) 0))])      
    world))
-|#
-
-;; Added mouse handling as an experiment since racket will run on windows tablets
-;; And touch events do come through as mouse events
-;; Unfortunately it's not multi-touch so things don't work well if both players
-;; are trying to "swipe" their paddles at the same time.  Turns out fairly useable
-;; though if the players simply tap to position their paddles.
-(define (handle-mouse world x y mouseevent)
-  (if (or (string=? mouseevent "drag") (string=? mouseevent "button-down"))
-     (cond
-        [(or (eq? (pong-world-status world) "left-player-won")
-             (eq? (pong-world-status world) "right-player-won"))
-           initial-world]
-        [(and (eq? (pong-world-status world) "left-player-serves")
-              (< x CENTER-HORZ))
-           (serve world)]
-        [(and (eq? (pong-world-status world) "right-player-serves")
-              (> x CENTER-HORZ))
-           (serve world)]
-        [else (if (> x CENTER-HORZ)
-          (set-right-paddle world (make-paddle (make-posn RIGHT (min y (- BOTTOM PADDLE-HEIGHT 2)))
-                                     (make-direction 0 1)
-                                     0))
-          (set-left-paddle world (make-paddle (make-posn MARGIN (min y (- BOTTOM PADDLE-HEIGHT 2)))
-                                     (make-direction 0 1)
-                                     0)))])
-   world))
 
 ;; print msg to stdout (and return true)
 (define (dbgmsg msg) 
@@ -645,4 +639,4 @@ CAN I PRESERVE THIS AS AN OPTION?
     true))
 
 ;; run the game
-(main initial-world)
+(main initial-state)
