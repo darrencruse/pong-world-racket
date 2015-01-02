@@ -161,12 +161,12 @@
 ;; main entry point
 ;;
 ;; start the game by evaluating in drracket:
-;;   (main initial-state)
+;;   (main initial-world)
 ;;
 ;; or from the command line:
 ;; $ racket
 ;; > (enter! "pong-world.rkt")
-;; > (main initial-state)
+;; > (main initial-world)
 ;;
 (define (main world)
   (if SHOW-PAD
@@ -187,9 +187,25 @@
             [on-mouse handle-mouse]
             [stop-when quitting? draw-goodbye])))
 
+;; Number Number Number -> Number
+;; compute the new coordinate given the current coordinate, direction of movement, and speed.
+;; current is the x or y coordinate by itself
+;; dir is the dx or dy part of the Direction in the range [0,1]
+;; speed is the in pixels
+
+(check-expect (move-coord 0 0 0) 0)
+(check-expect (move-coord 100 1 10) 110)
+(check-expect (move-coord 100 -1 10) 90)
+
 (define (move-coord current dir speed)
   ;; round to hold coordinates to simple integers
   (round (+ current (* dir speed))))
+
+;; Ball -> Ball
+;; move the ball according to it's direction and speed
+
+(check-expect (move-ball (make-ball (make-posn 100 100) (make-direction -0.5 0.5) 2))
+                 (make-ball (make-posn 99 101) (make-direction -0.5 0.5) 2))
 
 (define (move-ball ball)
   (make-ball (make-posn 
@@ -198,11 +214,20 @@
                (ball-dir ball)
                (ball-speed ball)))
       
+;; Number Number Number -> Number
 ;; Compute the new y coordinate after moving the paddle in direction dir at speed speed
 ;; This also constrains the paddle within the top and bottom walls
+
+(check-expect (move-paddle-vert 100 0.5 2) 101)
+(check-expect (move-paddle-vert (- BOTTOM PADDLE-HEIGHT 2) 0.75 12) (- BOTTOM PADDLE-HEIGHT 2))
+(check-expect (move-paddle-vert (+ TOP 2) -0.75 12) (+ TOP 2))
+
 (define (move-paddle-vert current-y dir speed)
   ;; note: we round to hold coordinates to simple integers
   (min (max (round (+ current-y (* dir speed))) (+ TOP 2)) (- BOTTOM PADDLE-HEIGHT 2))) 
+
+;; Paddle -> Paddle
+;; move the paddle according to it's direction and speed
 
 (define (move-paddle paddle)
   (make-paddle (make-posn 
@@ -214,6 +239,9 @@
                (paddle-dir paddle)
                (paddle-speed paddle)))
 
+;; Ball Number Number Number Number Number -> Ball
+;; move the ball according to it's direction and speed 
+;; bouncing off the top or bottom walls 
 (define (vertical-bounce ball x y dx dy speed)
     ;; if we're moving up
     (if (< dy 0)
@@ -244,7 +272,9 @@
           (direction-dx (ball-dir ball))
           (direction-dy (ball-dir ball))
           (ball-speed ball)))
-      
+
+;; Pong-World Ball -> Pong-World
+;; Set the ball on the given pong-world 
 (define (pong-world-set-ball world ball)
   (make-pong-world
      (pong-world-status world)
@@ -254,6 +284,8 @@
      (pong-world-left-score world)
      (pong-world-right-score world)))
 
+;; Pong-World String -> Pong-World
+;; Set the status on the given pong-world 
 (define (pong-world-set-status world status)
   (make-pong-world
      status
@@ -263,6 +295,9 @@
      (pong-world-left-score world)
      (pong-world-right-score world)))
 
+;; Pong-World String -> Pong-World
+;; score a point for the specified side
+;; side is one of "left", "right"
 (define (score-a-point world side)
   (if (play-sound BOOP-MISSED)
     ;; I let the player who lost the point serve next
@@ -283,7 +318,18 @@
         (pong-world-left-score world)
         (+ (pong-world-right-score world) 1)))
     world))
-  
+ 
+;; Pong-World Number Number Number Number Number Number Number -> Pong-World
+;; bounce the ball off the left or right paddles (otherwise score a point)
+;; world is the current world
+;; left-paddle-y is the y coordinate of (the top of) the left paddle
+;; right-paddle-y is the y coordinate of (the top of) the right paddle
+;; x is the x coordinate of the ball.
+;; y is the y coordinate of the ball.
+;; dx is the x direction of the ball in [0,1]
+;; dy is the y direction of the ball in [0,1]
+;; speed is the speed of the ball
+
 (define (horizontal-bounce-y world left-paddle-y right-paddle-y x y dx dy speed)
     ;; if we're moving left
     (if (< dx 0)
@@ -315,11 +361,20 @@
          (score-a-point world "left"))
        ;; we haven't hit the right
        world)))
-     
-(define (horizontal-bounce world left-paddle right-paddle x y dx dy speed)
+    
+;; Pong-World Number Number Number Number Number -> Pong-World
+;; bounce the ball off the left or right paddles (otherwise score a point)
+;; world is the current world
+;; x is the x coordinate of the ball.
+;; y is the y coordinate of the ball.
+;; dx is the x direction of the ball in [0,1]
+;; dy is the y direction of the ball in [0,1]
+;; speed is the speed of the ball
+
+(define (horizontal-bounce world x y dx dy speed)
   (horizontal-bounce-y world 
-                     (posn-y (paddle-pos left-paddle)) 
-                     (posn-y (paddle-pos right-paddle)) x y dx dy speed))
+                     (posn-y (paddle-pos (pong-world-left-paddle world))) 
+                     (posn-y (paddle-pos (pong-world-right-paddle world))) x y dx dy speed))
 
 ;; The farther the ball hits from the center of the paddle the steeper the deflection
 (define (vary-dy-by-intersection paddle-y intersect-y)
@@ -337,15 +392,14 @@
 ;; Check if the paddle blocked the ball otherwise score the appropriate player.
 ;; Returns the world
 (define (check-paddle-block world)
-  (horizontal-bounce world 
-          (pong-world-left-paddle world)
-          (pong-world-right-paddle world)          
+  (horizontal-bounce world           
           (posn-x (ball-pos (pong-world-ball world)))
           (posn-y (ball-pos (pong-world-ball world)))
           (direction-dx (ball-dir (pong-world-ball world)))
           (direction-dy (ball-dir (pong-world-ball world)))
           (ball-speed (pong-world-ball world))))
 
+;; Paddle Direction Number -> Paddle
 ;; set the paddle moving in the specified direction and speed
 ;; returns a paddle with the specified direction and speed (but the original position)
 (define (set-paddle-moving paddle dir speed)
@@ -354,22 +408,15 @@
     dir
     speed))
 
-;; stop the paddle by setting it's speed to 0
-;; returns a paddle with zero speed (but the original position)
+;; Paddle Posn -> Paddle
+;; sets the position of the specified paddle
 (define (set-paddle-pos paddle pos)
   (make-paddle 
     pos
     (paddle-dir paddle)
     (paddle-speed paddle)))
 
-;; stop the paddle by setting it's speed to 0
-;; returns a paddle with zero speed (but the original position)
-(define (stop-paddle paddle)
-  (make-paddle 
-    (paddle-pos paddle)
-    (paddle-dir paddle)
-    0))
-
+;; set the specified paddle as left-paddle of the specified pong-world 
 (define (set-left-paddle world left-paddle)
   (make-pong-world
     (pong-world-status world)
@@ -379,6 +426,7 @@
     (pong-world-left-score world)
     (pong-world-right-score world)))
 
+;; set the specified paddle as right-paddle of the specified pong-world
 (define (set-right-paddle world right-paddle)
   (make-pong-world
     (pong-world-status world)
@@ -387,6 +435,14 @@
     right-paddle 
     (pong-world-left-score world)
     (pong-world-right-score world)))
+
+;; set the left paddle of the specified pong-world moving in the specified direction and speed
+(define (set-left-moving world dir speed)
+  (set-left-paddle world (set-paddle-moving (pong-world-left-paddle world) dir speed)))
+
+;; set the right paddle of the specified pong-world moving in the specified direction 
+(define (set-right-moving world dir speed)
+  (set-right-paddle world (set-paddle-moving (pong-world-right-paddle world) dir speed)))
 
 (define initial-posn (make-posn CENTER-HORZ CENTER-VERT))
 
@@ -397,7 +453,7 @@
      (make-direction initial-dx 0)
      INITIAL-SPEED))
                                 
-(define initial-state (make-pong-world 
+(define initial-world (make-pong-world 
                         "left-player-serves"
                         (serve-ball 0.5)
                         (make-paddle (make-posn MARGIN (- CENTER-VERT (/ PADDLE-HEIGHT 2))) 
@@ -408,7 +464,11 @@
                                      0)
                         0
                         0))
-                        
+
+;; 
+(check-expect (quitting? (pong-world-set-status initial-world "quitting")) true)
+(check-expect (quitting? (pong-world-set-status initial-world "in-play")) false)
+
 (define (quitting? world)
   (eq? (pong-world-status world) "quitting"))
 
@@ -528,48 +588,72 @@ PLAYFIELD-BG))
     (pong-world-left-score world)
     (pong-world-right-score world))) 
 
+; Pong-World key -> Pong-World
+; set the paddles moving according to which key is pressed 
+
+(check-expect (handle-key-down initial-world "w")  (set-left-moving initial-world UP-DIR PADDLE-SPEED))
+(check-expect (handle-key-down initial-world "s")  (set-left-moving initial-world DOWN-DIR PADDLE-SPEED))
+(check-expect (handle-key-down initial-world "up")  (set-right-moving initial-world UP-DIR PADDLE-SPEED))
+(check-expect (handle-key-down initial-world "down")  (set-right-moving initial-world DOWN-DIR PADDLE-SPEED))
+
 (define (handle-key-down world a-key)
   (cond
     [(key=? a-key "w") 
-        (set-left-paddle world (set-paddle-moving (pong-world-left-paddle world) UP-DIR PADDLE-SPEED))]
+       (set-left-moving world UP-DIR PADDLE-SPEED)]
     [(key=? a-key "s")
-        (set-left-paddle world (set-paddle-moving (pong-world-left-paddle world) DOWN-DIR PADDLE-SPEED))]
+       (set-left-moving world DOWN-DIR PADDLE-SPEED)]
     [(key=? a-key "up") 
-        (set-right-paddle world (set-paddle-moving (pong-world-right-paddle world) UP-DIR PADDLE-SPEED))]
+       (set-right-moving world UP-DIR PADDLE-SPEED)]
     [(key=? a-key "down") 
-        (set-right-paddle world (set-paddle-moving (pong-world-right-paddle world) DOWN-DIR PADDLE-SPEED))]
+       (set-right-moving world DOWN-DIR PADDLE-SPEED)]
     [else world]))
+
+; Pong-World key -> Pong-World
+; stops the paddles moving, or serves the ball, according to which key is released 
+
+(check-expect (handle-key-up initial-world "w")  (set-left-moving initial-world UP-DIR 0))
+(check-expect (handle-key-up initial-world "s")  (set-left-moving initial-world UP-DIR 0))
+(check-expect (handle-key-up initial-world "up")  (set-right-moving initial-world UP-DIR 0))
+(check-expect (handle-key-up initial-world "down")  (set-right-moving initial-world UP-DIR 0))
 
 (define (handle-key-up world a-key)
   (cond
-    [(or (key=? a-key "w") (key=? a-key "s")) 
-        (set-left-paddle world (stop-paddle (pong-world-left-paddle world)))]
-    [(or (key=? a-key "up") (key=? a-key "down")) 
-        (set-right-paddle world (stop-paddle (pong-world-right-paddle world)))]
+    [(or (key=? a-key "w") (key=? a-key "s"))
+      ;; stop paddle by setting speed to zero (dir doesn't matter)
+      (set-left-moving world UP-DIR 0)]
+    [(or (key=? a-key "up") (key=? a-key "down"))
+      ;; stop paddle by setting speed to zero (dir doesn't matter)
+      (set-right-moving world UP-DIR 0)]
     ;; not sure why but escape didn't work (on mac at least) in handle-key-down
     [(key=? a-key "escape") 
-        (pong-world-set-status world "quitting")]
+      (pong-world-set-status world "quitting")]
     [(key=? a-key " ")
-        (cond 
+        (cond
+          ;; space shouldn't do anything during play:
           [(eq? (pong-world-status world) "in-play") world]
+          ;; but otherwise it serves the ball:
           [(or (eq? (pong-world-status world) "left-player-serves")
                (eq? (pong-world-status world) "right-player-serves"))
             (serve world)]
-          [else initial-state])]
+          ;; otherwise start a new game
+          [else initial-world])]
     [else world]))
 
-
+;; Pong-World Number Number String -> Pong-World
 ;; Added mouse handling as an experiment since racket will run on windows tablets
 ;; And touch events do come through as mouse events
 ;; Unfortunately it's not multi-touch so things don't work well if both players
 ;; are trying to "swipe" their paddles at the same time.  Turns out fairly useable
-;; though if the players simply tap to position their paddles.  
+;; though if the players simply tap to position their paddles.
+
+(check-expect (handle-mouse initial-world 100 100 "drag") (serve initial-world))
+
 (define (handle-mouse world x y mouseevent)
   (if (or (string=? mouseevent "drag") (string=? mouseevent "button-down"))
      (cond 
         [(or (eq? (pong-world-status world) "left-player-won")
              (eq? (pong-world-status world) "right-player-won"))
-           initial-state]
+           initial-world]
         [(and (eq? (pong-world-status world) "left-player-serves")
               (< x CENTER-HORZ))
            (serve world)] 
@@ -577,9 +661,11 @@ PLAYFIELD-BG))
               (> x CENTER-HORZ))
            (serve world)]
         [else (if (> x CENTER-HORZ)
+          ;; they clicked on the right set the position of the right paddle
           (set-right-paddle world (make-paddle (make-posn RIGHT (min y (- BOTTOM PADDLE-HEIGHT 2))) 
                                      (make-direction 0 1) 
                                      0))
+          ;; they clicked on the left set the position of the right paddle
           (set-left-paddle world (make-paddle (make-posn MARGIN (min y (- BOTTOM PADDLE-HEIGHT 2))) 
                                      (make-direction 0 1) 
                                      0)))])      
