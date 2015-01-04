@@ -56,22 +56,28 @@ Then you can build the whalesong version of pong-world by doing:
     $ ./build.sh
 ```
 
-The generated files are written to the build sub-directory and you can run them from there.
+The generated files are written to the build sub-directory.
+
+You can open pong-world.html in your browser from there as before.
 
 Enabling Sound
 --------------
 
 Sound effects are available for the racket version of the game (only at this time).
 
-These sound effects are commented out by default, because they depend on an additional "rsound" racket library they must be manually installed by doing:
+These sound effects are commented out by default, because they depend on an additional "rsound" racket library that must be separately installed.
+
+To install rsound do the following from a shell window (the directory doesn't matter):
 
 ```
     raco pkg install rsound
 ```
 
-Once you do that uncomment the appropriate code section indicated at the top of the pong-world.rkt file.
+Once you've done that uncomment the appropriate code section indicated at the top of the pong-world.rkt file.
 
-On the Mac that's all that's necessary but for Windows and Linux there's additional steps as follows:
+On the Mac that's all that's necessary.
+
+For Windows and Linux you may need to do the following additional steps:
 
 * On Windows:  
 
@@ -94,12 +100,8 @@ On the Mac that's all that's necessary but for Windows and Linux there's additio
     $ cd portaudio
     $ ./configure && make
     $ sudo make install
-    $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
-    $ drracket
+    $ echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib" >> ~/.bash_profile
+    $ . ~/.bash_profile
 ```
 
-
-
-
-
-
+Once these steps are done sound should work from both racket and drracket when running the game.
