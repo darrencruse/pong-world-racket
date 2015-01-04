@@ -118,7 +118,7 @@
 ;; The direction of movement as a unit velocity vector
 ;; dx and dy in the range [0,1]
 ;; dx and dy are multiplied by speed to compute the # of pixels to move
-(define-struct direction [dx dy])
+(struct direction [dx dy] #:mutable #:constructor-name make-direction )
 
 ;; Paddle direction straight up
 (define UP-DIR (make-direction 0 -1))
@@ -130,7 +130,7 @@
 ;; the ball's current x/y position
 ;; its direction as a unit x/y vector (x and y in the range [0,1])
 ;; its speed (in pixels) along that vector
-(define-struct ball [pos dir speed])
+(struct ball [pos dir speed] #:mutable #:constructor-name make-ball)
 
 ;; each paddle
 ;; we've chosen to match the ball's structure despite the paddle only moving vertically
@@ -139,14 +139,42 @@
 ;; each paddles current x/y position
 ;; its direction as a unit x/y vector (x and y in the range [0,1])
 ;; its speed (in pixels) along that vector
-(define-struct paddle [pos dir speed])
+(struct paddle [pos dir speed] #:mutable #:constructor-name make-paddle)
 
 ;; the state of our pong world:
-;; status = "left-player-serves", "right-player-serves", "in-play", "left-player-won", "right-player-won", "quitting"
+;; status = "left-player-serves", 
+;;          "right-player-serves", 
+;;          "in-play", 
+;;          "left-player-won", 
+;;          "right-player-won", 
+;;          "quitting"
 ;; the ball (a structure - see above)
 ;; the left and right paddle y position
 ;; the left and right players score 
-(define-struct pong-world [status ball left-paddle right-paddle left-score right-score])
+(struct pong-world [status ball left-paddle right-paddle left-score right-score] #:mutable #:constructor-name make-pong-world)
+
+;; mutably set a field using the provided setter, and get back the changed instance
+(define (mutate-and-return setter instance field-val)
+  (begin
+    (apply setter (list instance field-val))
+    instance))
+
+;; adapt racket's generated setter functions so that we get back the world
+;; this is just to ease the transition from our original BSL code which
+;; always returned the "modified copy".  Also note that unfortunately 
+;; whalesong does not yet support "struct-copy".
+(define (pong-world-set-status world status)
+   (mutate-and-return set-pong-world-status! world status)) 
+(define (pong-world-set-ball world ball)
+   (mutate-and-return set-pong-world-ball! world ball)) 
+(define (pong-world-set-left-paddle world left-paddle)
+   (mutate-and-return set-pong-world-left-paddle! world left-paddle))
+(define (pong-world-set-right-paddle world right-paddle)
+   (mutate-and-return set-pong-world-right-paddle! world right-paddle))
+(define (pong-world-set-left-score world left-score)
+   (mutate-and-return set-pong-world-left-score! world left-score))
+(define (pong-world-set-right-score world right-score)
+   (mutate-and-return set-pong-world-right-score! world right-score))
 
 ;;
 ;; main entry point
@@ -228,24 +256,6 @@
           (direction-dy (ball-dir ball))
           (ball-speed ball)))
       
-(define (pong-world-set-ball world ball)
-  (make-pong-world
-     (pong-world-status world)
-     ball
-     (pong-world-left-paddle world)
-     (pong-world-right-paddle world)
-     (pong-world-left-score world)
-     (pong-world-right-score world)))
-
-(define (pong-world-set-status world status)
-  (make-pong-world
-     status
-     (pong-world-ball world)
-     (pong-world-left-paddle world)
-     (pong-world-right-paddle world)
-     (pong-world-left-score world)
-     (pong-world-right-score world)))
-
 (define (score-a-point world side)
   (if (play-sound BOOP-MISSED)
     ;; I let the player who lost the point serve next
@@ -352,24 +362,6 @@
     (paddle-pos paddle)
     (paddle-dir paddle)
     0))
-
-(define (set-left-paddle world left-paddle)
-  (make-pong-world
-    (pong-world-status world)
-    (pong-world-ball world)
-    left-paddle 
-    (pong-world-right-paddle world) 
-    (pong-world-left-score world)
-    (pong-world-right-score world)))
-
-(define (set-right-paddle world right-paddle)
-  (make-pong-world
-    (pong-world-status world)
-    (pong-world-ball world)
-    (pong-world-left-paddle world) 
-    right-paddle 
-    (pong-world-left-score world)
-    (pong-world-right-score world)))
 
 (define initial-posn (make-posn CENTER-HORZ CENTER-VERT))
 
@@ -486,7 +478,7 @@ ORIGINAL WITH NET
                     scene))
   
 (define (draw-pong-world world)
-  (if (dbgmsg (string-append "draw " (number->string (random 10)) "\n"))
+  (begin (dbgmsg (string-append "draw " (number->string (random 10)) "\n"))
   (cond 
     [(eq? (pong-world-status world) "in-play") 
        (place-image-top-left BALL 
@@ -508,8 +500,7 @@ ORIGINAL WITH NET
     [(eq? (pong-world-status world) "right-player-won")
        (display-msg "You won!!!" 48
                     (+ CENTER-HORZ 200) CENTER-VERT
-                    (draw-idle-game world))])
-PLAYFIELD-BG))
+                    (draw-idle-game world))])))
 
 (define (handle-tick world)
   (if (eq? (pong-world-status world) "in-play")
@@ -544,32 +535,26 @@ PLAYFIELD-BG))
 ;; serve simply sets the status to "in-play"
 ;; (the ball is already set with the proper direction and speed)
 (define (serve world)
-  (make-pong-world 
-    "in-play"
-    (pong-world-ball world)
-    (pong-world-left-paddle world)
-    (pong-world-right-paddle world)
-    (pong-world-left-score world)
-    (pong-world-right-score world))) 
+  (pong-world-set-status world "in-play"))
 
 (define (handle-key-down world a-key)
   (cond
     [(key=? a-key "w")
-        (set-left-paddle world (set-paddle-moving (pong-world-left-paddle world) UP-DIR PADDLE-SPEED))]
+        (pong-world-set-left-paddle world (set-paddle-moving (pong-world-left-paddle world) UP-DIR PADDLE-SPEED))]
     [(key=? a-key "s")
-        (set-left-paddle world (set-paddle-moving (pong-world-left-paddle world) DOWN-DIR PADDLE-SPEED))]
+        (pong-world-set-left-paddle world (set-paddle-moving (pong-world-left-paddle world) DOWN-DIR PADDLE-SPEED))]
     [(key=? a-key "up")
-        (set-right-paddle world (set-paddle-moving (pong-world-right-paddle world) UP-DIR PADDLE-SPEED))]
+        (pong-world-set-right-paddle world (set-paddle-moving (pong-world-right-paddle world) UP-DIR PADDLE-SPEED))]
     [(key=? a-key "down")
-        (set-right-paddle world (set-paddle-moving (pong-world-right-paddle world) DOWN-DIR PADDLE-SPEED))]
+        (pong-world-set-right-paddle world (set-paddle-moving (pong-world-right-paddle world) DOWN-DIR PADDLE-SPEED))]
     [else world]))
 
 (define (handle-key-up world a-key)
   (cond
     [(or (key=? a-key "w") (key=? a-key "s"))
-        (set-left-paddle world (stop-paddle (pong-world-left-paddle world)))]
+        (pong-world-set-left-paddle world (stop-paddle (pong-world-left-paddle world)))]
     [(or (key=? a-key "up") (key=? a-key "down"))
-        (set-right-paddle world (stop-paddle (pong-world-right-paddle world)))]
+        (pong-world-set-right-paddle world (stop-paddle (pong-world-right-paddle world)))]
     ;; not sure why but escape didn't work (on mac at least) in handle-key-down
     [(key=? a-key "escape")
         (pong-world-set-status world "quitting")]
@@ -630,10 +615,10 @@ CAN I PRESERVE THIS AS AN OPTION?
               (> x CENTER-HORZ))
            (serve world)]
         [else (if (> x CENTER-HORZ)
-          (set-right-paddle world (make-paddle (make-posn RIGHT (min y (- BOTTOM PADDLE-HEIGHT 2)))
+          (pong-world-set-right-paddle world (make-paddle (make-posn RIGHT (min y (- BOTTOM PADDLE-HEIGHT 2)))
                                      (make-direction 0 1)
                                      0))
-          (set-left-paddle world (make-paddle (make-posn MARGIN (min y (- BOTTOM PADDLE-HEIGHT 2)))
+          (pong-world-set-left-paddle world (make-paddle (make-posn MARGIN (min y (- BOTTOM PADDLE-HEIGHT 2)))
                                      (make-direction 0 1)
                                      0)))])
    world))

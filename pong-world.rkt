@@ -1,9 +1,9 @@
-;; The first three lines of this file were inserted by DrRacket. They record metadata
-;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-beginner-reader.ss" "lang")((modname pong-world) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ())))
+#lang racket
+
 (require 2htdp/universe)
 (require 2htdp/image)
-(require 2htdp/batch-io)
+(require htdp/testing)
+(require lang/posn)
 
 ;; Display debug messages to the console?
 (define SHOW-DEBUG-MSGS false)
@@ -151,11 +151,82 @@
 (define-struct paddle [pos dir speed])
 
 ;; the state of our pong world:
-;; status = "left-player-serves", "right-player-serves", "in-play", "left-player-won", "right-player-won", "quitting"
+;; status = "left-player-serves", 
+;;          "right-player-serves", 
+;;          "in-play", 
+;;          "left-player-won", 
+;;          "right-player-won", 
+;;          "quitting"
 ;; the ball (a structure - see above)
 ;; the left and right paddle y position
 ;; the left and right players score 
-(define-struct pong-world [status ball left-paddle right-paddle left-score right-score])
+
+#|
+;; Here's an approach using struct-copy with an *immutable* pong-world state
+;; side note: "struct-copy" is not yet supported in whalesong.
+(struct pong-world 
+  [status ball left-paddle right-paddle left-score right-score] 
+  #:constructor-name make-pong-world)
+
+(define (pong-world-set-status world status)
+  (struct-copy pong-world world [status status])) 
+(define (pong-world-set-ball world ball)
+  (struct-copy pong-world world [ball ball])) 
+(define (pong-world-set-left-paddle world left-paddle)
+  (struct-copy pong-world world [left-paddle left-paddle]))
+(define (pong-world-set-right-paddle world right-paddle)
+  (struct-copy pong-world world [right-paddle right-paddle]))
+(define (pong-world-set-left-score world left-score)
+  (struct-copy pong-world world [left-score left-score]))
+(define (pong-world-set-right-score world right-score)
+  (struct-copy pong-world world [right-score right-score]))
+|#
+
+#|
+;; Another approach was to skip the above wrapper functions entirely
+;; and directly do e.g.:
+;;
+;;  (pong-fupdate world status "in-play")
+;;
+;; "fupdate" meaning "functional update".
+;;
+;; This was achieved with a macro as follows:
+;;
+;;  (define-syntax-rule (pong-fupdate instance field-id field-val)
+;;    (struct-copy pong-world instance [field-id field-val]))
+|#
+
+;#|
+;; Here's an approach using struct-copy with a *mutable* pong-world state
+;; side note: *this* approach does work fine in whalesong.
+(struct pong-world 
+  [status ball left-paddle right-paddle left-score right-score] 
+  #:mutable 
+  #:constructor-name make-pong-world)
+
+;; we adapt racket's generated setter functions so that we get back the world
+;; this is just to ease the transition to/from the more functional/immutable
+;; style in which we always return the "modified copy".
+
+;; mutably set a field using the provided setter, and get back the changed instance
+(define (mutate-and-return setter instance field-val)
+  (begin
+    (apply setter (list instance field-val))
+    instance))
+
+(define (pong-world-set-status world status)
+   (mutate-and-return set-pong-world-status! world status)) 
+(define (pong-world-set-ball world ball)
+   (mutate-and-return set-pong-world-ball! world ball)) 
+(define (pong-world-set-left-paddle world left-paddle)
+   (mutate-and-return set-pong-world-left-paddle! world left-paddle))
+(define (pong-world-set-right-paddle world right-paddle)
+   (mutate-and-return set-pong-world-right-paddle! world right-paddle))
+(define (pong-world-set-left-score world left-score)
+   (mutate-and-return set-pong-world-left-score! world left-score))
+(define (pong-world-set-right-score world right-score)
+   (mutate-and-return set-pong-world-right-score! world right-score))
+;|#
 
 ;;
 ;; main entry point
@@ -168,6 +239,9 @@
 ;; > (enter! "pong-world.rkt")
 ;; > (main initial-world)
 ;;
+
+;;(check-expect (main initial-world) initial-world)
+
 (define (main world)
   (if SHOW-PAD
     (big-bang world
@@ -272,28 +346,6 @@
           (direction-dx (ball-dir ball))
           (direction-dy (ball-dir ball))
           (ball-speed ball)))
-
-;; Pong-World Ball -> Pong-World
-;; Set the ball on the given pong-world 
-(define (pong-world-set-ball world ball)
-  (make-pong-world
-     (pong-world-status world)
-     ball
-     (pong-world-left-paddle world)
-     (pong-world-right-paddle world)
-     (pong-world-left-score world)
-     (pong-world-right-score world)))
-
-;; Pong-World String -> Pong-World
-;; Set the status on the given pong-world 
-(define (pong-world-set-status world status)
-  (make-pong-world
-     status
-     (pong-world-ball world)
-     (pong-world-left-paddle world)
-     (pong-world-right-paddle world)
-     (pong-world-left-score world)
-     (pong-world-right-score world)))
 
 ;; Pong-World String -> Pong-World
 ;; score a point for the specified side
@@ -416,33 +468,13 @@
     (paddle-dir paddle)
     (paddle-speed paddle)))
 
-;; set the specified paddle as left-paddle of the specified pong-world 
-(define (set-left-paddle world left-paddle)
-  (make-pong-world
-    (pong-world-status world)
-    (pong-world-ball world)
-    left-paddle 
-    (pong-world-right-paddle world) 
-    (pong-world-left-score world)
-    (pong-world-right-score world)))
-
-;; set the specified paddle as right-paddle of the specified pong-world
-(define (set-right-paddle world right-paddle)
-  (make-pong-world
-    (pong-world-status world)
-    (pong-world-ball world)
-    (pong-world-left-paddle world) 
-    right-paddle 
-    (pong-world-left-score world)
-    (pong-world-right-score world)))
-
 ;; set the left paddle of the specified pong-world moving in the specified direction and speed
 (define (set-left-moving world dir speed)
-  (set-left-paddle world (set-paddle-moving (pong-world-left-paddle world) dir speed)))
+  (pong-world-set-left-paddle world (set-paddle-moving (pong-world-left-paddle world) dir speed)))
 
 ;; set the right paddle of the specified pong-world moving in the specified direction 
 (define (set-right-moving world dir speed)
-  (set-right-paddle world (set-paddle-moving (pong-world-right-paddle world) dir speed)))
+  (pong-world-set-right-paddle world (set-paddle-moving (pong-world-right-paddle world) dir speed)))
 
 (define initial-posn (make-posn CENTER-HORZ CENTER-VERT))
 
@@ -523,7 +555,7 @@
                     scene))
   
 (define (draw-pong-world world)
-  (if (dbgmsg (string-append "draw " (number->string (random 10)) "\n"))
+  (begin (dbgmsg (string-append "draw " (number->string (random 10)) "\n"))
   (cond 
     [(eq? (pong-world-status world) "in-play") 
        (place-image BALL 
@@ -545,8 +577,7 @@
     [(eq? (pong-world-status world) "right-player-won")
        (display-msg "You won!!!" 48
                     (+ CENTER-HORZ 200) CENTER-VERT
-                    (draw-idle-game world))])
-PLAYFIELD-BG))
+                    (draw-idle-game world))])))
 
 (define (handle-tick world)
   (if (eq? (pong-world-status world) "in-play")
@@ -580,14 +611,8 @@ PLAYFIELD-BG))
 ;; serve simply sets the status to "in-play"
 ;; (the ball is already set with the proper direction and speed)
 (define (serve world)
-  (make-pong-world 
-    "in-play"
-    (pong-world-ball world)
-    (pong-world-left-paddle world)
-    (pong-world-right-paddle world)
-    (pong-world-left-score world)
-    (pong-world-right-score world))) 
-
+  (pong-world-set-status world "in-play"))
+ 
 ; Pong-World key -> Pong-World
 ; set the paddles moving according to which key is pressed 
 
@@ -662,17 +687,17 @@ PLAYFIELD-BG))
            (serve world)]
         [else (if (> x CENTER-HORZ)
           ;; they clicked on the right set the position of the right paddle
-          (set-right-paddle world (make-paddle (make-posn RIGHT (min y (- BOTTOM PADDLE-HEIGHT 2))) 
+          (pong-world-set-right-paddle world (make-paddle (make-posn RIGHT (min y (- BOTTOM PADDLE-HEIGHT 2))) 
                                      (make-direction 0 1) 
                                      0))
           ;; they clicked on the left set the position of the right paddle
-          (set-left-paddle world (make-paddle (make-posn MARGIN (min y (- BOTTOM PADDLE-HEIGHT 2))) 
+          (pong-world-set-left-paddle world (make-paddle (make-posn MARGIN (min y (- BOTTOM PADDLE-HEIGHT 2))) 
                                      (make-direction 0 1) 
                                      0)))])      
    world))
 
-;; print msg to stdout (and return true)
+;; print debug msg (if SHOW-DEBUG-MSGS is true)
 (define (dbgmsg msg) 
   (if SHOW-DEBUG-MSGS
-    (or (string? (write-file 'stdout msg)) true)
+    (display msg)
     true))

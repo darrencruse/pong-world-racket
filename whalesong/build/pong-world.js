@@ -14478,72 +14478,6 @@ var LLRBTree = {};
 "use strict";
 var param;
 var RT = plt.runtime;
-var _61=function(M){if(--M.cbt<0){throw _61;}
-M.e[M.e.length-2]=M.v;
-return(_59)(M);};
-
-var _56=function(M){if(--M.cbt<0){throw _56;}
-M.e[M.e.length-2]=M.v;
-return(_54)(M);};
-
-
-var _34=function(M){if(--M.cbt<0){throw _34;}
-M.e[M.e.length-2]=M.v;
-return(_32)(M);};
-
-var _31=function(M){if(--M.cbt<0){throw _31;}
-M.e[M.e.length-1]=M.v;
-M.e.push(void(0),void(0));
-M.e[M.e.length-1]=M.e[M.e.length-5];
-M.e.push(M.e[M.e.length-6]);
-M.p=_7_c;
-M.a=1;
-M.c.push(new RT.CallFrame(_34,M.p));
-return(_7)(M);};
-
-var _29=function(M){if(--M.cbt<0){throw _29;}
-return(_27)(M);};
-
-var _349=function(M){M.c.push(new RT.CallFrame(_351,M.p)); M.addPrompt(RT.DEFAULT_CONTINUATION_PROMPT_TAG,false,M.e.length);
-M.e.push([]);M.e[M.e.length-1].names=[];
-M.v=_346_c;
-M.a=1;
-M.v=M.v;
-M.e.splice(M.e.length-((M.a-1)+1),1);
-M.p=M.c[M.c.length-1].label;
-M.c.pop();
-return(M.p)(M);};
-
-var _293=function(M){if(--M.cbt<0){throw _293;}
-M.e.length-=(M.a-1);
-return(_294)(M);};
-
-var _297=function(M){M.e.push(void(0),void(0));
-M.e[M.e.length-1]=M.e[M.e.length-4];
-M.e[M.e.length-2]=RT.checkedCdr(M, M.e[M.e.length-5]);
-M.p=M.e[M.e.length-3];
-M.a=2;
-M.e.splice(M.e.length-5,3);
-M.c[M.c.length-1].p=M.p;
-return(_291)(M);};
-
-var _295=function(M){M.e.push(void(0),void(0));
-M.e[M.e.length-1]=M.e[M.e.length-4];
-M.e[M.e.length-2]=(RT.testArgument(M,"caarpair",RT.isCaarPair,M.e[M.e.length-5],0,"caar")).first.first;
-M.v=(M.e[M.e.length-1]===M.e[M.e.length-2]);
-M.e.length-=2;
-if(M.v===false){return(_297)(M);}else{M.v=RT.checkedCar(M, M.e[M.e.length-3]);
-M.e.length-=3;
-M.p=M.c[M.c.length-1].label;
-M.c.pop();
-return(M.p)(M);}};
-
-var _26=function(M){if(--M.cbt<0){throw _26;}
-return(_24)(M);};
-
-var _21=function(M){if(--M.cbt<0){throw _21;}
-return(_19)(M);};
-
 var _372=function(M){if(--M.cbt<0){throw _372;}
 M.e.length-=(M.a-1);
 return(_373)(M);};
@@ -14780,6 +14714,15 @@ M.e.splice(M.e.length-2,1);
 M.c[M.c.length-1].p=M.p;
 return(_347)(M);};
 
+var _349=function(M){M.c.push(new RT.CallFrame(_351,M.p)); M.addPrompt(RT.DEFAULT_CONTINUATION_PROMPT_TAG,false,M.e.length);
+M.e.push([]);M.e[M.e.length-1].names=[];
+M.v=_346_c;
+M.a=1;
+M.v=M.v;
+M.e.splice(M.e.length-((M.a-1)+1),1);
+M.p=M.c[M.c.length-1].label;
+M.c.pop();
+return(M.p)(M);};
 
 var _65=function(M){if(--M.cbt<0){throw _65;}
 
@@ -14792,15 +14735,18 @@ M.p=M.c[M.c.length-1].label;
 M.c.pop();
 return(M.p)(M);}};
 
-var _64=function(M){if(--M.cbt<0){throw _64;}
-
-//"lambda body for loop"
-
-M.e.push(M.e[M.e.length-2]);
-M.p=_65_c;
+var _callCCEntry=function(M){if(--M.cbt<0){throw _callCCEntry;}
+M.p=M.e[M.e.length-1];
+M.e.push(void(0),void(0));
+M.e[M.e.length-1]=M.captureControl(0,RT.DEFAULT_CONTINUATION_PROMPT_TAG);
+M.e[M.e.length-2]=M.e.slice(0, M.e.length-3);
+M.e[M.e.length-3]=new RT.Closure(_callCCClosureEntry,1,[M.e[M.e.length-2],M.e[M.e.length-1]],"call/cc");
+M.e.length-=2;
 M.a=1;
-M.c.push(new RT.CallFrame(_82,M.p));
-return(_65)(M);};
+RT.checkClosureAndArity(M);
+M.e.splice(M.e.length-1,0);
+M.c[M.c.length-1].p=M.p;
+return((M.p).label)(M);};
 
 var _63=function(M){if(--M.cbt<0){throw _63;}
 
@@ -14835,15 +14781,6 @@ M.v=_62_c;
 M.a=1;
 M.v=M.v;
 M.e.splice(M.e.length-((M.a-1)+1),1);
-M.p=M.c[M.c.length-1].label;
-M.c.pop();
-return(M.p)(M);};
-
-var _callCCClosureEntry=function(M){if(--M.cbt<0){throw _callCCClosureEntry;}
-M.v=M.e[M.e.length-1];
-M.e.push(M.p.closedVals[0],M.p.closedVals[1]);
-M.restoreControl(RT.DEFAULT_CONTINUATION_PROMPT_TAG);
-M.e=M.e[M.e.length-2].slice(0);
 M.p=M.c[M.c.length-1].label;
 M.c.pop();
 return(M.p)(M);};
@@ -14917,6 +14854,15 @@ M.e.length-=5;
 M.p=M.c[M.c.length-1].label;
 M.c.pop();
 return(M.p)(M);}};
+
+var _callCCClosureEntry=function(M){if(--M.cbt<0){throw _callCCClosureEntry;}
+M.v=M.e[M.e.length-1];
+M.e.push(M.p.closedVals[0],M.p.closedVals[1]);
+M.restoreControl(RT.DEFAULT_CONTINUATION_PROMPT_TAG);
+M.e=M.e[M.e.length-2].slice(0);
+M.p=M.c[M.c.length-1].label;
+M.c.pop();
+return(M.p)(M);};
 
 var _334=function(M){if(--M.cbt<0){throw _334;}
 
@@ -15300,20 +15246,6 @@ M.p=M.c[M.c.length-1].label;
 M.c.pop();
 return(M.p)(M);};
 
-var _197=function(M){if(M.v===false){return(_195)(M);}else{M.v=RT.NULL;
-M.e.length-=3;
-M.p=M.c[M.c.length-1].label;
-M.c.pop();
-return(M.p)(M);}};
-
-var _311=function(M){M.e.push(void(0),void(0));
-M.e[M.e.length-1]=M.e[M.e.length-4];
-M.e[M.e.length-2]=RT.checkedCdr(M, M.e[M.e.length-5]);
-M.p=M.e[M.e.length-3];
-M.a=2;
-M.e.splice(M.e.length-5,3);
-M.c[M.c.length-1].p=M.p;
-return(_305)(M);};
 
 var _184=function(M){if(--M.cbt<0){throw _184;}
 
@@ -15326,23 +15258,27 @@ M.a=1;
 M.c.push(new RT.CallFrame(_199,M.p));
 return(_185)(M);};
 
-var _306=function(M){M.c.push(new RT.CallFrame(_308,M.p)); M.addPrompt(RT.DEFAULT_CONTINUATION_PROMPT_TAG,false,M.e.length);
-M.e.push([]);M.e[M.e.length-1].names=[];
-M.e.push(void(0));
-M.e[M.e.length-1]=new RT.Closure(_305,2,void(0),"assv");
-M.e[M.e.length-1].closedVals=[M.e[M.e.length-1]];
-M.v=M.e[M.e.length-1];
-M.a=1;
-M.e.splice(M.e.length-((M.a-1)+1),1);
-M.v=M.v;
-M.e.splice(M.e.length-((M.a-1)+1),1);
-M.p=M.c[M.c.length-1].label;
-M.c.pop();
-return(M.p)(M);};
+var _183=function(M){if(--M.cbt<0){throw _183;}
 
-var _245=function(M){if(--M.cbt<0){throw _245;}
-M.e.length-=(M.a-1);
-return(_246)(M);};
+//"lambda body for do-it"
+
+M.e.push(M.p.closedVals[0]);
+M.e.push(void(0),void(0));
+//"Constant toplevel ref: ?"
+
+M.p=M.e[M.e.length-3][1];
+M.e[M.e.length-1]=M.e[M.e.length-4];
+M.e[M.e.length-2]=M.e[M.e.length-5];
+M.a=2;
+RT.checkClosureAndArity(M);
+M.e.splice(M.e.length-5,3);
+M.c[M.c.length-1].p=M.p;
+return((M.p).label)(M);};
+
+var _32=function(M){M.p=_3_c;
+M.a=2;
+M.c.push(new RT.CallFrame(_37,M.p));
+return(_3)(M);};
 
 var _243=function(M){if(--M.cbt<0){throw _243;}
 
@@ -15416,17 +15352,20 @@ M.p=M.c[M.c.length-1].label;
 M.c.pop();
 return(M.p)(M);};
 
-var _291=function(M){if(--M.cbt<0){throw _291;}
-
-//"lambda body for assq"
-
-M.e.push(M.p.closedVals[0]);
-M.v=(M.e[M.e.length-3]===RT.NULL);
-if(M.v===false){return(_295)(M);}else{M.v=false;
-M.e.length-=3;
-M.p=M.c[M.c.length-1].label;
-M.c.pop();
-return(M.p)(M);}};
+var _236=function(M){M.e.push(void(0),void(0));
+M.e.push(void(0));
+M.e[M.e.length-1]=RT.checkedCar(M, M.e[M.e.length-4]);
+M.e[M.e.length-2]=RT.checkedCdr(M, M.e[M.e.length-1]);
+M.e.pop();
+M.e.push(void(0));
+M.e.push(M.e[M.e.length-4]);
+M.v=M.primitives["unsafe-cdr"]._i(M);
+M.e.pop();
+M.e[M.e.length-1]=M.v;
+M.p=_188_c;
+M.a=1;
+M.c.push(new RT.CallFrame(_240,M.p));
+return(_188)(M);};
 
 var _233=function(M){M.v=RT.makePair(M.e[M.e.length-1],M.e[M.e.length-2]);
 M.e.length-=3;
@@ -15482,11 +15421,9 @@ M.a=1;
 M.c.push(new RT.CallFrame(_56,M.p));
 return(_6)(M);};
 
-var _195=function(M){M.e.push(M.e[M.e.length-3]);
-M.p=_186_c;
-M.a=1;
-M.c.push(new RT.CallFrame(_204,M.p));
-return(_186)(M);};
+var _307=function(M){if(--M.cbt<0){throw _307;}
+M.e.length-=(M.a-1);
+return(_308)(M);};
 
 var _47=function(M){M.e.push(void(0));
 M.e.push(M.e[M.e.length-2]);
@@ -15548,10 +15485,9 @@ M.c.pop();
 return(M.p)(M);};
 
 
-var _32=function(M){M.p=_3_c;
-M.a=2;
-M.c.push(new RT.CallFrame(_37,M.p));
-return(_3)(M);};
+var _245=function(M){if(--M.cbt<0){throw _245;}
+M.e.length-=(M.a-1);
+return(_246)(M);};
 
 
 var _7=function(M){if(--M.cbt<0){throw _7;}
@@ -15719,20 +15655,12 @@ M.c.pop();
 return(M.p)(M);};
 
 
-var _236=function(M){M.e.push(void(0),void(0));
-M.e.push(void(0));
-M.e[M.e.length-1]=RT.checkedCar(M, M.e[M.e.length-4]);
-M.e[M.e.length-2]=RT.checkedCdr(M, M.e[M.e.length-1]);
+var _385=function(M){if(--M.cbt<0){throw _385;}
+if(M.a===1){return(_387)(M);}else{if(M.a===0){return(_386)(M);}else{M.v=M.e[M.e.length-1];
 M.e.pop();
-M.e.push(void(0));
-M.e.push(M.e[M.e.length-4]);
-M.v=M.primitives["unsafe-cdr"]._i(M);
-M.e.pop();
-M.e[M.e.length-1]=M.v;
-M.p=_188_c;
-M.a=1;
-M.c.push(new RT.CallFrame(_240,M.p));
-return(_188)(M);};
+M.p=(M.c[M.c.length-1].label.mvr||RT.si_context_expected_1);
+M.c.pop();
+return(M.p)(M);}}};
 
 var _292=function(M){M.c.push(new RT.CallFrame(_294,M.p)); M.addPrompt(RT.DEFAULT_CONTINUATION_PROMPT_TAG,false,M.e.length);
 M.e.push([]);M.e[M.e.length-1].names=[];
@@ -15880,23 +15808,26 @@ M.p=M.c[M.c.length-1].label;
 M.c.pop();
 return(M.p)(M);}};
 
-var _307=function(M){if(--M.cbt<0){throw _307;}
-M.e.length-=(M.a-1);
-return(_308)(M);};
-
-var _callCCEntry=function(M){if(--M.cbt<0){throw _callCCEntry;}
-M.p=M.e[M.e.length-1];
-M.e.push(void(0),void(0));
-M.e[M.e.length-1]=M.captureControl(0,RT.DEFAULT_CONTINUATION_PROMPT_TAG);
-M.e[M.e.length-2]=M.e.slice(0, M.e.length-3);
-M.e[M.e.length-3]=new RT.Closure(_callCCClosureEntry,1,[M.e[M.e.length-2],M.e[M.e.length-1]],"call/cc");
-M.e.length-=2;
+var _195=function(M){M.e.push(M.e[M.e.length-3]);
+M.p=_186_c;
 M.a=1;
-RT.checkClosureAndArity(M);
-M.e.splice(M.e.length-1,0);
-M.c[M.c.length-1].p=M.p;
-return((M.p).label)(M);};
+M.c.push(new RT.CallFrame(_204,M.p));
+return(_186)(M);};
 
+var _197=function(M){if(M.v===false){return(_195)(M);}else{M.v=RT.NULL;
+M.e.length-=3;
+M.p=M.c[M.c.length-1].label;
+M.c.pop();
+return(M.p)(M);}};
+
+var _311=function(M){M.e.push(void(0),void(0));
+M.e[M.e.length-1]=M.e[M.e.length-4];
+M.e[M.e.length-2]=RT.checkedCdr(M, M.e[M.e.length-5]);
+M.p=M.e[M.e.length-3];
+M.a=2;
+M.e.splice(M.e.length-5,3);
+M.c[M.c.length-1].p=M.p;
+return(_305)(M);};
 
 var _185=function(M){if(--M.cbt<0){throw _185;}
 
@@ -15921,22 +15852,19 @@ M.p=M.c[M.c.length-1].label;
 M.c.pop();
 return(M.p)(M);}};
 
-var _183=function(M){if(--M.cbt<0){throw _183;}
-
-//"lambda body for do-it"
-
-M.e.push(M.p.closedVals[0]);
-M.e.push(void(0),void(0));
-//"Constant toplevel ref: ?"
-
-M.p=M.e[M.e.length-3][1];
-M.e[M.e.length-1]=M.e[M.e.length-4];
-M.e[M.e.length-2]=M.e[M.e.length-5];
-M.a=2;
-RT.checkClosureAndArity(M);
-M.e.splice(M.e.length-5,3);
-M.c[M.c.length-1].p=M.p;
-return((M.p).label)(M);};
+var _306=function(M){M.c.push(new RT.CallFrame(_308,M.p)); M.addPrompt(RT.DEFAULT_CONTINUATION_PROMPT_TAG,false,M.e.length);
+M.e.push([]);M.e[M.e.length-1].names=[];
+M.e.push(void(0));
+M.e[M.e.length-1]=new RT.Closure(_305,2,void(0),"assv");
+M.e[M.e.length-1].closedVals=[M.e[M.e.length-1]];
+M.v=M.e[M.e.length-1];
+M.a=1;
+M.e.splice(M.e.length-((M.a-1)+1),1);
+M.v=M.v;
+M.e.splice(M.e.length-((M.a-1)+1),1);
+M.p=M.c[M.c.length-1].label;
+M.c.pop();
+return(M.p)(M);};
 
 var _190=function(M){M.c.push(new RT.CallFrame(_192,M.p)); M.addPrompt(RT.DEFAULT_CONTINUATION_PROMPT_TAG,false,M.e.length);
 M.e.push([M.globals["or"]!==void(0)?M.globals["or"]:M.params.currentNamespace.get("or"),false,false]);M.e[M.e.length-1].names=["or",false,false];
@@ -16009,9 +15937,6 @@ M.p=M.c[M.c.length-1].label;
 M.c.pop();
 return(M.p)(M);}};
 
-var _37=function(M){if(--M.cbt<0){throw _37;}
-M.e[M.e.length-2]=M.v;
-return(_35)(M);};
 
 var _78=function(M){M.e.push(M.e[M.e.length-2]);
 M.p=_66_c;
@@ -16040,12 +15965,17 @@ return((M.p).label)(M);};
 var _388=function(M){RT.Primitives["apply"]=RT.Primitives["apply"]||_389_c;
 };
 
-var _385=function(M){if(--M.cbt<0){throw _385;}
-if(M.a===1){return(_387)(M);}else{if(M.a===0){return(_386)(M);}else{M.v=M.e[M.e.length-1];
-M.e.pop();
-M.p=(M.c[M.c.length-1].label.mvr||RT.si_context_expected_1);
+var _291=function(M){if(--M.cbt<0){throw _291;}
+
+//"lambda body for assq"
+
+M.e.push(M.p.closedVals[0]);
+M.v=(M.e[M.e.length-3]===RT.NULL);
+if(M.v===false){return(_295)(M);}else{M.v=false;
+M.e.length-=3;
+M.p=M.c[M.c.length-1].label;
 M.c.pop();
-return(M.p)(M);}}};
+return(M.p)(M);}};
 
 var _386=function(M){M.p=(M.c[M.c.length-1].label.mvr||RT.si_context_expected_1);
 M.c.pop();
@@ -16253,6 +16183,76 @@ var _10=function(M){if(--M.cbt<0){throw _10;}
 RT.Primitives["map"]=RT.Primitives["map"]||M.v;
 return(_69)(M);};
 
+var _61=function(M){if(--M.cbt<0){throw _61;}
+M.e[M.e.length-2]=M.v;
+return(_59)(M);};
+
+var _56=function(M){if(--M.cbt<0){throw _56;}
+M.e[M.e.length-2]=M.v;
+return(_54)(M);};
+
+var _37=function(M){if(--M.cbt<0){throw _37;}
+M.e[M.e.length-2]=M.v;
+return(_35)(M);};
+
+var _34=function(M){if(--M.cbt<0){throw _34;}
+M.e[M.e.length-2]=M.v;
+return(_32)(M);};
+
+var _31=function(M){if(--M.cbt<0){throw _31;}
+M.e[M.e.length-1]=M.v;
+M.e.push(void(0),void(0));
+M.e[M.e.length-1]=M.e[M.e.length-5];
+M.e.push(M.e[M.e.length-6]);
+M.p=_7_c;
+M.a=1;
+M.c.push(new RT.CallFrame(_34,M.p));
+return(_7)(M);};
+
+var _29=function(M){if(--M.cbt<0){throw _29;}
+return(_27)(M);};
+
+
+var _64=function(M){if(--M.cbt<0){throw _64;}
+
+//"lambda body for loop"
+
+M.e.push(M.e[M.e.length-2]);
+M.p=_65_c;
+M.a=1;
+M.c.push(new RT.CallFrame(_82,M.p));
+return(_65)(M);};
+
+var _293=function(M){if(--M.cbt<0){throw _293;}
+M.e.length-=(M.a-1);
+return(_294)(M);};
+
+var _297=function(M){M.e.push(void(0),void(0));
+M.e[M.e.length-1]=M.e[M.e.length-4];
+M.e[M.e.length-2]=RT.checkedCdr(M, M.e[M.e.length-5]);
+M.p=M.e[M.e.length-3];
+M.a=2;
+M.e.splice(M.e.length-5,3);
+M.c[M.c.length-1].p=M.p;
+return(_291)(M);};
+
+var _295=function(M){M.e.push(void(0),void(0));
+M.e[M.e.length-1]=M.e[M.e.length-4];
+M.e[M.e.length-2]=(RT.testArgument(M,"caarpair",RT.isCaarPair,M.e[M.e.length-5],0,"caar")).first.first;
+M.v=(M.e[M.e.length-1]===M.e[M.e.length-2]);
+M.e.length-=2;
+if(M.v===false){return(_297)(M);}else{M.v=RT.checkedCar(M, M.e[M.e.length-3]);
+M.e.length-=3;
+M.p=M.c[M.c.length-1].label;
+M.c.pop();
+return(M.p)(M);}};
+
+var _26=function(M){if(--M.cbt<0){throw _26;}
+return(_24)(M);};
+
+var _21=function(M){if(--M.cbt<0){throw _21;}
+return(_19)(M);};
+
 _10.mvr=_9;
 _92.mvr=_91;
 _71.mvr=_70;
@@ -16272,38 +16272,38 @@ _373.mvr=_372;
 var sym22574=RT.makeSymbol("map");
 var sym22575=RT.makeSymbol("ormap");
 var sym22573=RT.makeSymbol("andmap");
-var sym22576=RT.makeSymbol("for-each");var _5_c=new RT.Closure(_5,1,void(0),"some-empty?");
-var _126_c=new RT.Closure(_126,1,void(0),"some-empty?");
-var _346_c=new RT.Closure(_346,(RT.makeArityAtLeast(0)),void(0),"unknown");
-var _66_c=new RT.Closure(_66,1,void(0),"some-empty?");
-var _65_c=new RT.Closure(_65,1,void(0),"all-empty?");
-var _64_c=new RT.Closure(_64,2,void(0),"loop");
-var _347_c=new RT.Closure(_347,1,void(0),"append-many");
-var _63_c=new RT.Closure(_63,2,void(0),"do-it");
-var _62_c=new RT.Closure(_62,(RT.makeArityAtLeast(1)),void(0),"unknown");
-var _4_c=new RT.Closure(_4,1,void(0),"all-empty?");
-var _2_c=new RT.Closure(_2,2,void(0),"do-it");
-var _3_c=new RT.Closure(_3,2,void(0),"loop");
-var _1_c=new RT.Closure(_1,(RT.makeArityAtLeast(1)),void(0),"unknown");
-var _389_c=new RT.Closure(_389,(RT.makeArityAtLeast(2)),void(0),"apply");
-var _385_c=new RT.Closure(_385,(RT.makeArityAtLeast(0)),void(0),"values");
+var sym22576=RT.makeSymbol("for-each");var _385_c=new RT.Closure(_385,(RT.makeArityAtLeast(0)),void(0),"values");
 var _370_c=new RT.Closure(_370,2,void(0),"unknown");
+var _callCCEntry_c=new RT.Closure(_callCCEntry,1,void(0),"call/cc");
 var _188_c=new RT.Closure(_188,1,void(0),"rest-lists");
 var _187_c=new RT.Closure(_187,1,void(0),"first-tuple");
 var _186_c=new RT.Closure(_186,1,void(0),"some-empty?");
-var _callCCEntry_c=new RT.Closure(_callCCEntry,1,void(0),"call/cc");
 var _128_c=new RT.Closure(_128,1,void(0),"rest-lists");
 var _185_c=new RT.Closure(_185,1,void(0),"all-empty?");
 var _127_c=new RT.Closure(_127,1,void(0),"first-tuple");
 var _334_c=new RT.Closure(_334,2,void(0),"length-iter");
 var _333_c=new RT.Closure(_333,1,void(0),"unknown");
 var _243_c=new RT.Closure(_243,1,void(0),"unknown");
-var _68_c=new RT.Closure(_68,1,void(0),"rest-lists");
+var _7_c=new RT.Closure(_7,1,void(0),"rest-lists");
 var _125_c=new RT.Closure(_125,1,void(0),"all-empty?");
 var _348_c=new RT.Closure(_348,2,void(0),"append-2");
 var _6_c=new RT.Closure(_6,1,void(0),"first-tuple");
-var _7_c=new RT.Closure(_7,1,void(0),"rest-lists");
-var _67_c=new RT.Closure(_67,1,void(0),"first-tuple");M.params.currentErrorHandler = fail;
+var _68_c=new RT.Closure(_68,1,void(0),"rest-lists");
+var _67_c=new RT.Closure(_67,1,void(0),"first-tuple");
+var _66_c=new RT.Closure(_66,1,void(0),"some-empty?");
+var _347_c=new RT.Closure(_347,1,void(0),"append-many");
+var _346_c=new RT.Closure(_346,(RT.makeArityAtLeast(0)),void(0),"unknown");
+var _5_c=new RT.Closure(_5,1,void(0),"some-empty?");
+var _65_c=new RT.Closure(_65,1,void(0),"all-empty?");
+var _3_c=new RT.Closure(_3,2,void(0),"loop");
+var _126_c=new RT.Closure(_126,1,void(0),"some-empty?");
+var _63_c=new RT.Closure(_63,2,void(0),"do-it");
+var _62_c=new RT.Closure(_62,(RT.makeArityAtLeast(1)),void(0),"unknown");
+var _4_c=new RT.Closure(_4,1,void(0),"all-empty?");
+var _2_c=new RT.Closure(_2,2,void(0),"do-it");
+var _64_c=new RT.Closure(_64,2,void(0),"loop");
+var _1_c=new RT.Closure(_1,(RT.makeArityAtLeast(1)),void(0),"unknown");
+var _389_c=new RT.Closure(_389,(RT.makeArityAtLeast(2)),void(0),"apply");M.params.currentErrorHandler = fail;
 for (param in params) {
     if (Object.hasOwnProperty.call(params, param)) {
         M.params[param] = params[param];
