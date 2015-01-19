@@ -6,13 +6,13 @@ Pong is the "hello world" of video game programming.
 Here are three variations on classic pong I've developed in Racket:
 
 pongworld
-  a two player (but one computer!) pong game using the big-bang "world" approach.
+  * a two player (but one computer!) pong game using the big-bang "world" approach.
 
 pongiverse
-  a networked client/server pong game using the one-world-is-not-enough "universe" approach.
+  * a networked client/server pong game using the one-world-is-not-enough "universe" approach.
 
 pongsong
-  pongworld ported to whalesong so it runs in the browser
+  * pongworld ported to whalesong so it runs in the browser
 
 Background
 ----------
@@ -185,7 +185,7 @@ It takes a while to build, but if all goes well the resulting files wind up unde
 
 Now you simply bring up your favorite browser, use File->Open and open the file pongsong/build/pong-world.html.
 
-You should find the pong game playing in your browser (minus the nice looking "gamepad" graphics at the bottom), and minus sound.  Whalesong doesn't currently support sound, which is to say the whalesong has yet to sing, but I'm sure it will someday :).
+You should find the pong game playing in your browser (minus the nice looking "gamepad" graphics at the bottom), and minus sound.  Whalesong doesn't currently support sound, which is to say the whalesong doesn't sing, but I'm sure she will someday :).
 
 To enable sounds in the other versions read on...
 
