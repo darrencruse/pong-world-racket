@@ -12,20 +12,29 @@
   "structs.rkt"
   "moving.rkt")
  
- ;; blank-world is just a convenient template for use in tests below
- (define blank-world (create-initial-world "left-player-serves" (serve-ball 0.5)))
- 
+;; blank-world is just a convenient template for use in tests below
+(define blank-world (create-initial-world "left-player-serves" 
+                      (make-ball (make-position CENTER-HORZ CENTER-VERT)
+                        (make-direction 0.5 0)
+                        INITIAL-SPEED)))
+
 (define (handle-tick world)
-  (if (eq? (pong-world-status world) "in-play")
+  (if (string=? (pong-world-status world) "in-play")
     ;; the paddles and the ball moves during a point:
-    (check-paddle-block 
-      (make-pong-world 
-        (pong-world-status world)
-        (vertical-ball-bounce (move-ball (pong-world-ball world)))
-        (move-paddle (pong-world-left-paddle world))
-        (move-paddle (pong-world-right-paddle world))
-        (pong-world-left-score world)
-        (pong-world-right-score world)))
+    (check-paddle-block
+      (let
+        ([original-ball-dy (direction-dy (ball-dir (pong-world-ball world)))]
+        [new-ball (vertical-ball-bounce (move-ball (pong-world-ball world)))])
+        ;; set the wall sound to play if we bounced in the (y direction)
+        (pong-world-set-sound
+         (make-pong-world 
+          (pong-world-status world)
+          new-ball
+          (move-paddle (pong-world-left-paddle world))
+          (move-paddle (pong-world-right-paddle world))
+          (pong-world-left-score world)
+          (pong-world-right-score world))
+         (if (eq? original-ball-dy (direction-dy (ball-dir new-ball))) "none" "wall"))))
     ;; let the paddles still move between points: 
     (make-pong-world 
       (pong-world-status world)
@@ -54,7 +63,7 @@
     [(key=? a-key "down") 
        (set-right-moving world DOWN-DIR PADDLE-SPEED)]
     [else world]))
-
+ 
 ; Pong-World key -> Pong-World
 ; stops the paddles moving, or serves the ball, according to which key is released 
 
@@ -75,16 +84,23 @@
     [(key=? a-key "escape") 
       (pong-world-set-status world "quitting")]
     [(key=? a-key " ")
+      (begin
+        (dbgmsg (string-append "its a space: " 
+                  (pong-world-status world) "\n"))
         (cond
           ;; space shouldn't do anything during play:
-          [(eq? (pong-world-status world) "in-play") world]
+          [(string=? (pong-world-status world) "in-play") world]
           ;; but otherwise it serves the ball:
-          [(or (eq? (pong-world-status world) "left-player-serves")
-               (eq? (pong-world-status world) "right-player-serves"))
-            (serve world)]
-          ;; otherwise start a new game
-          [else blank-world])]
-    [else world]))
+          [(string=? (pong-world-status world) "left-player-serves")
+            (serve-ball world 0.5 INITIAL-SPEED)]
+          [(string=? (pong-world-status world) "right-player-serves")
+            (serve-ball world -0.5 INITIAL-SPEED)]
+          ;; otherwise prepare to start a new game
+          [else (pong-world-set-status blank-world "left-player-serves")]))]
+    [else 
+      (begin
+        (dbgmsg "in handle-key-up default")
+        world)]))
 
 ;; Pong-World Number Number String -> Pong-World
 ;; Added mouse handling as an experiment since racket will run on windows tablets
@@ -93,7 +109,7 @@
 ;; are trying to "swipe" their paddles at the same time.  Turns out fairly useable
 ;; though if the players simply tap to position their paddles.
 
-(check-expect (handle-mouse blank-world 100 100 "drag") (serve blank-world))
+(check-expect (handle-mouse blank-world 100 100 "drag") (serve-ball blank-world 0.5 INITIAL-SPEED))
 
 (define (handle-mouse world x y mouseevent)
   (if (or (string=? mouseevent "drag") (string=? mouseevent "button-down"))
@@ -103,10 +119,10 @@
            blank-world]
         [(and (eq? (pong-world-status world) "left-player-serves")
               (< x CENTER-HORZ))
-           (serve world)] 
+           (serve-ball world 0.5 INITIAL-SPEED)] 
         [(and (eq? (pong-world-status world) "right-player-serves")
               (> x CENTER-HORZ))
-           (serve world)]
+           (serve-ball world -0.5 INITIAL-SPEED)]
         [else (if (> x CENTER-HORZ)
           ;; they clicked on the right set the position of the right paddle
           (pong-world-set-right-paddle world (make-paddle (make-position RIGHT (min y (- BOTTOM PADDLE-HEIGHT 2))) 

@@ -5,12 +5,12 @@
 (require 2htdp/universe
   2htdp/image
   htdp/testing
-  "../common/dbgmsg.rkt"
-  "../common/constants.rkt"
-  "../common/structs.rkt"
-  "../common/drawing.rkt"
-  "../common/moving.rkt"
-  "../common/sound.rkt")
+  "../pongparts/dbgmsg.rkt"
+  "../pongparts/constants.rkt"
+  "../pongparts/structs.rkt"
+  "../pongparts/drawing.rkt"
+  "../pongparts/moving.rkt"
+  "../pongparts/sound.rkt")
 
 ;;
 ;; main entry point
@@ -23,20 +23,7 @@
 ;; > (enter! "client.rkt")
 ;; > (play-pong "Darren" "left" "127.0.0.1")
 ;;
-
-;;(check-expect (main initial-world) initial-world)
-
-;; -------------------------------------------------------------------
-;; Initial World State
-;;   The big-bang is started with the initial world
-;;   state *before* the first message has been received from the 
-;;   server.  So we use this initial world state while "connecting"
-;;   i.e. while waiting for that first message.
-
-(define initial-world (create-initial-world 
-                        "connection" 
-                        (make-ball (make-position CENTER-HORZ CENTER-VERT)
-                          (make-direction 1 0) 1)))
+;; (or see run.rkt to test the game on a single machine)
 
 ;; Launch the Client.
 ;; playerName is a string e.g. "Matthias", "Darren"
@@ -63,7 +50,7 @@
       [on-release (lambda (world key) (handle-key-release playerType world key))]
       [stop-when (lambda (world) (string=? (pong-world-status world) "quitting")) draw-goodbye])))
 
-;; handles incoming messages
+;; handle incoming messages
 (define (handle-msg player-type world msg)
   ;; we've sent the entire world state as the message
   (begin
@@ -105,3 +92,15 @@
               (and (string=? (pong-world-status world) "right-player-serves") (key=? a-key " ")))) 
        (make-package world (make-key-msg player-type "release" a-key))]
     [else world]))
+
+;; -------------------------------------------------------------------
+;; Initial World State
+;;   The big-bang is started with the initial world
+;;   state *before* the first message has been received from the 
+;;   server.  So we use this initial world state while "connecting"
+;;   i.e. while waiting for that first message.
+
+(define initial-world (create-initial-world 
+                        "connection" 
+                        (make-ball (make-position CENTER-HORZ CENTER-VERT)
+                          (make-direction 1 0) 1)))

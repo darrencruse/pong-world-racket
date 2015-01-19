@@ -3,13 +3,13 @@
 (require 2htdp/universe
   2htdp/image
   htdp/testing
-  "../common/dbgmsg.rkt"
-  "../common/constants.rkt"
-  "../common/structs.rkt"
-  "../common/drawing.rkt"
-  "../common/moving.rkt"
-  "../common/events.rkt"
-  "../common/sound.rkt")
+  "../pongparts/dbgmsg.rkt"
+  "../pongparts/constants.rkt"
+  "../pongparts/structs.rkt"
+  "../pongparts/drawing.rkt"
+  "../pongparts/moving.rkt"
+  "../pongparts/events.rkt"
+  "../pongparts/sound.rkt")
 
 ;;
 ;; main entry point
@@ -44,5 +44,7 @@
             [on-mouse handle-mouse]
             [stop-when (lambda (world) (string=? (pong-world-status world) "quitting")) draw-goodbye])))
 
-(define initial-world (create-initial-world "left-player-serves" (serve-ball 0.5)))
-      
+(define initial-world (create-initial-world "left-player-serves" 
+                      (make-ball (make-position CENTER-HORZ CENTER-VERT)
+                        (make-direction 0.5 0)
+                        INITIAL-SPEED)))

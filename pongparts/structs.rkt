@@ -15,6 +15,7 @@
  pong-world-set-right-paddle
  pong-world-set-left-score
  pong-world-set-right-score
+ pong-world-set-sound
  create-initial-world)
 
 (require "constants.rkt")
@@ -109,6 +110,8 @@
   (struct-copy pong-world world [left-score left-score]))
 (define (pong-world-set-right-score world right-score)
   (struct-copy pong-world world [right-score right-score]))
+(define (pong-world-set-sound world sound)
+  (struct-copy pong-world world [sound sound]))
 |#
 
 ;;#|
@@ -148,6 +151,8 @@
    (mutate-and-return set-pong-world-left-score! world left-score))
 (define (pong-world-set-right-score world right-score)
    (mutate-and-return set-pong-world-right-score! world right-score))
+(define (pong-world-set-sound world sound-name)
+   (mutate-and-return set-pong-world-sound! world sound-name))
 
 ;;|#
 

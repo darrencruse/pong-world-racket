@@ -10,15 +10,13 @@
   set-right-moving
   vertical-ball-bounce
   check-paddle-block
-  serve-ball
-  serve)
+  serve-ball)
 
 (require 2htdp/universe
   htdp/testing
   "dbgmsg.rkt"
   "constants.rkt"
-  "structs.rkt"
-  "sound.rkt")
+  "structs.rkt")
 
 ;; Number Number Number -> Number
 ;; compute the new coordinate given the current coordinate, direction of movement, and speed.
@@ -82,17 +80,17 @@
        (if (< y TOP)
          ;; just flip to moving down 
          ;; note I have not computed a truly accurate x intercept
-         (if (play-sound "wall") (make-ball (make-position x TOP)
+         (make-ball (make-position x TOP)
                     (make-direction dx (- 0 dy))
-                    speed) ball)
+                    speed)
          ball)
        ;; else we're moving down - have we hit the bottom?
        (if (> y BOTTOM)
          ;; just flip to moving up 
          ;; note I have not computed a truly accurate x intercept
-         (if (play-sound "wall") (make-ball (make-position x BOTTOM)
+         (make-ball (make-position x BOTTOM)
                     (make-direction dx (- 0 dy))
-                    speed) ball)
+                    speed)
          ball))) 
 
 ;; Constrain the ball between TOP and BOTTOM, reversing
@@ -106,30 +104,32 @@
           (direction-dy (ball-dir ball))
           (ball-speed ball)))
 
-;; Pong-World String -> Pong-World
+ ;; Pong-World String -> Pong-World
 ;; score a point for the specified side
 ;; side is one of "left", "right"
 (define (score-a-point world side)
-  (if (play-sound "missed")
     ;; I let the player who lost the point serve next
-    (if (eq? side "left")
-      (make-pong-world    
+    (if (string=? side "left")
+      ;; we defer the actual playing of the sound to the same
+      ;; part of the system that draws the world state - so here
+      ;; we're just setting the name of the sound to be played later:
+      (pong-world-set-sound (make-pong-world    
         ;; games are 9 points
         (if (< (pong-world-left-score world) 8) "right-player-serves" "left-player-won")
-        (serve-ball -0.5)
+        (make-ball initial-position (make-direction -0.5 0) INITIAL-SPEED)
         (pong-world-left-paddle world)
         (pong-world-right-paddle world)
         (+ (pong-world-left-score world) 1)
-        (pong-world-right-score world))
-      (make-pong-world    
+        (pong-world-right-score world)) "missed")
+      (pong-world-set-sound (make-pong-world    
         (if (< (pong-world-right-score world) 8) "left-player-serves" "right-player-won")
-        (serve-ball 0.5)
+        (make-ball initial-position (make-direction 0.5 0) INITIAL-SPEED)
         (pong-world-left-paddle world)
         (pong-world-right-paddle world)
         (pong-world-left-score world)
-        (+ (pong-world-right-score world) 1)))
-    world))
- 
+        (+ (pong-world-right-score world) 1))
+        "missed")))
+
 ;; Pong-World Number Number Number Number Number Number Number -> Pong-World
 ;; bounce the ball off the left or right paddles (otherwise score a point)
 ;; world is the current world
@@ -148,12 +148,12 @@
        (if (< x LEFT)
          ;; did they block it?
          (if (and (> y (- left-paddle-y MARGIN)) (< y (+ left-paddle-y PADDLE-HEIGHT MARGIN)))
-           ;; yup - just flip to moving right 
+           ;; yup - flip to moving right (and play a sound) 
            ;; note I have not computed a truly accurate y intercept
-           (if (play-sound "paddle") (pong-world-set-ball world 
+           (pong-world-set-sound (pong-world-set-ball world 
                 (make-ball (make-position LEFT y)
                   (make-direction (- 0 dx) (vary-dy-by-intersection left-paddle-y y))
-                  (vary-speed-by-intersection speed left-paddle-y y))) world)
+                  (vary-speed-by-intersection speed left-paddle-y y))) "paddle")
            ;; nope they missed
            (score-a-point world "right"))
          ;; we haven't hit the left
@@ -162,17 +162,17 @@
        (if (> x RIGHT)
          ;; did they block it?
          (if (and (> y (- right-paddle-y MARGIN)) (< y (+ right-paddle-y PADDLE-HEIGHT MARGIN)))
-           ;; yup - just flip to moving left 
+           ;; yup - flip to moving left (and play a sound) 
            ;; note I have not computed a truly accurate y intercept
-           (if (play-sound "paddle") (pong-world-set-ball world 
+           (pong-world-set-sound (pong-world-set-ball world 
                 (make-ball (make-position RIGHT y)
                   (make-direction (- 0 dx) (vary-dy-by-intersection right-paddle-y y))
-                  (vary-speed-by-intersection speed right-paddle-y y))) world)
+                  (vary-speed-by-intersection speed right-paddle-y y))) "paddle")
          ;; nope they missed
          (score-a-point world "left"))
        ;; we haven't hit the right
        world)))
-    
+     
 ;; Pong-World Number Number Number Number Number -> Pong-World
 ;; bounce the ball off the left or right paddles (otherwise score a point)
 ;; world is the current world
@@ -219,7 +219,7 @@
     dir
     speed))
 
-;; Paddle Posn -> Paddle
+;; Paddle Position -> Paddle
 ;; sets the position of the specified paddle
 (define (set-paddle-pos paddle pos)
   (make-paddle 
@@ -237,14 +237,13 @@
 
 (define initial-position (make-position CENTER-HORZ CENTER-VERT))
 
-;; Makes an initialized ball moving from center screen
-;; vertically flat with direction dx
-(define (serve-ball initial-dx)
-  (make-ball initial-position
-     (make-direction initial-dx 0)
-     INITIAL-SPEED))
-
-;; serve simply sets the status to "in-play"
-;; (the ball is already set with the proper direction and speed)
-(define (serve world)
-  (pong-world-set-status world "in-play"))
+;; PongWorld Number Number -> PongWorld
+;; Makes a world with an initialized ball moving from center screen
+;; vertically flat with direction dx and speed speed
+(define (serve-ball world dx speed)
+  (pong-world-set-status 
+    (pong-world-set-ball world 
+      (make-ball initial-position
+        (make-direction dx 0)
+        speed)) 
+    "in-play"))

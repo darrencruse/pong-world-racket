@@ -1,0 +1,12 @@
+CACHE MANIFEST
+## Timestamp: Monday, January 19th, 2015 10:11:34am
+pong-world-bsl.js
+pong-world-bsl_1.js
+optimer-normal-normal.js
+canvas.text.js
+excanvas.js
+pong-world-bsl-module-manifest.js
+
+# All other resources (e.g. sites) require the user to be online.
+NETWORK:
+*
