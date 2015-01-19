@@ -14,6 +14,10 @@ The server is responsible for:
 -- starting the game 
 -- collecting and broadcasting information about the movement of the ball and paddles
 -- ending games
+
+   We pass our entire "world state" (repeatedly) from server to client.
+   For the client this world state is just used for drawing.
+   It's the server that modifies the world state for *both* clients.
 |#
 
 ;

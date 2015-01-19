@@ -6,7 +6,6 @@
   "../common/dbgmsg.rkt"
   "../common/constants.rkt"
   "../common/structs.rkt"
-  "../common/structs-immutable-world.rkt"
   "../common/drawing.rkt"
   "../common/moving.rkt"
   "../common/events.rkt"
@@ -35,7 +34,7 @@
             [on-pad handle-key-down]
             [on-release handle-key-up]
             [on-mouse handle-mouse]
-            [stop-when quitting? draw-goodbye])
+            [stop-when (lambda (world) (string=? (pong-world-status world) "quitting")) draw-goodbye])
     (big-bang world
             [name "Pong World"]
             [on-tick handle-tick]
@@ -43,5 +42,7 @@
             [on-key handle-key-down]
             [on-release handle-key-up]
             [on-mouse handle-mouse]
-            [stop-when quitting? draw-goodbye])))
+            [stop-when (lambda (world) (string=? (pong-world-status world) "quitting")) draw-goodbye])))
+
+(define initial-world (create-initial-world "left-player-serves" (serve-ball 0.5)))
       

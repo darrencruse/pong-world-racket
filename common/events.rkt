@@ -2,7 +2,6 @@
 
 (provide handle-tick
          handle-key-down
-         quitting?
          handle-key-up
          handle-mouse)
 
@@ -11,8 +10,10 @@
   "dbgmsg.rkt"
   "constants.rkt"
   "structs.rkt"
-  "structs-immutable-world.rkt"
   "moving.rkt")
+ 
+ ;; blank-world is just a convenient template for use in tests below
+ (define blank-world (create-initial-world "left-player-serves" (serve-ball 0.5)))
  
 (define (handle-tick world)
   (if (eq? (pong-world-status world) "in-play")
@@ -37,10 +38,10 @@
 ; Pong-World key -> Pong-World
 ; set the paddles moving according to which key is pressed 
 
-(check-expect (handle-key-down initial-world "w")  (set-left-moving initial-world UP-DIR PADDLE-SPEED))
-(check-expect (handle-key-down initial-world "s")  (set-left-moving initial-world DOWN-DIR PADDLE-SPEED))
-(check-expect (handle-key-down initial-world "up")  (set-right-moving initial-world UP-DIR PADDLE-SPEED))
-(check-expect (handle-key-down initial-world "down")  (set-right-moving initial-world DOWN-DIR PADDLE-SPEED))
+(check-expect (handle-key-down blank-world "w")  (set-left-moving blank-world UP-DIR PADDLE-SPEED))
+(check-expect (handle-key-down blank-world "s")  (set-left-moving blank-world DOWN-DIR PADDLE-SPEED))
+(check-expect (handle-key-down blank-world "up")  (set-right-moving blank-world UP-DIR PADDLE-SPEED))
+(check-expect (handle-key-down blank-world "down")  (set-right-moving blank-world DOWN-DIR PADDLE-SPEED))
 
 (define (handle-key-down world a-key)
   (cond
@@ -57,10 +58,10 @@
 ; Pong-World key -> Pong-World
 ; stops the paddles moving, or serves the ball, according to which key is released 
 
-(check-expect (handle-key-up initial-world "w")  (set-left-moving initial-world UP-DIR 0))
-(check-expect (handle-key-up initial-world "s")  (set-left-moving initial-world UP-DIR 0))
-(check-expect (handle-key-up initial-world "up")  (set-right-moving initial-world UP-DIR 0))
-(check-expect (handle-key-up initial-world "down")  (set-right-moving initial-world UP-DIR 0))
+(check-expect (handle-key-up blank-world "w")  (set-left-moving blank-world UP-DIR 0))
+(check-expect (handle-key-up blank-world "s")  (set-left-moving blank-world UP-DIR 0))
+(check-expect (handle-key-up blank-world "up")  (set-right-moving blank-world UP-DIR 0))
+(check-expect (handle-key-up blank-world "down")  (set-right-moving blank-world UP-DIR 0))
 
 (define (handle-key-up world a-key)
   (cond
@@ -82,15 +83,8 @@
                (eq? (pong-world-status world) "right-player-serves"))
             (serve world)]
           ;; otherwise start a new game
-          [else initial-world])]
+          [else blank-world])]
     [else world]))
-
-;; If they hit the escape key we set the world status to "quitting"
-(check-expect (quitting? (pong-world-set-status initial-world "quitting")) true)
-(check-expect (quitting? (pong-world-set-status initial-world "in-play")) false)
-
-(define (quitting? world)
-  (eq? (pong-world-status world) "quitting"))
 
 ;; Pong-World Number Number String -> Pong-World
 ;; Added mouse handling as an experiment since racket will run on windows tablets
@@ -99,14 +93,14 @@
 ;; are trying to "swipe" their paddles at the same time.  Turns out fairly useable
 ;; though if the players simply tap to position their paddles.
 
-(check-expect (handle-mouse initial-world 100 100 "drag") (serve initial-world))
+(check-expect (handle-mouse blank-world 100 100 "drag") (serve blank-world))
 
 (define (handle-mouse world x y mouseevent)
   (if (or (string=? mouseevent "drag") (string=? mouseevent "button-down"))
      (cond 
         [(or (eq? (pong-world-status world) "left-player-won")
              (eq? (pong-world-status world) "right-player-won"))
-           initial-world]
+           blank-world]
         [(and (eq? (pong-world-status world) "left-player-serves")
               (< x CENTER-HORZ))
            (serve world)] 

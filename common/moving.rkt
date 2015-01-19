@@ -11,15 +11,13 @@
   vertical-ball-bounce
   check-paddle-block
   serve-ball
-  serve
-  initial-world)
+  serve)
 
 (require 2htdp/universe
   htdp/testing
   "dbgmsg.rkt"
   "constants.rkt"
   "structs.rkt"
-  "structs-immutable-world.rkt"
   "sound.rkt")
 
 ;; Number Number Number -> Number
@@ -250,7 +248,3 @@
 ;; (the ball is already set with the proper direction and speed)
 (define (serve world)
   (pong-world-set-status world "in-play"))
-
-(define initial-world (create-initial-world "left-player-serves" (serve-ball 0.5)))
-
- 
