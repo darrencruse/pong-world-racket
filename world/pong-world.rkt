@@ -3,14 +3,14 @@
 (require 2htdp/universe
   2htdp/image
   htdp/testing
-  "common/dbgmsg.rkt"
-  "common/constants.rkt"
-  "common/structs.rkt"
-  "common/structs-immutable-world.rkt"
-  "common/drawing.rkt"
-  "common/moving.rkt"
-  "common/events.rkt"
-  "common/sound.rkt")
+  "../common/dbgmsg.rkt"
+  "../common/constants.rkt"
+  "../common/structs.rkt"
+  "../common/structs-immutable-world.rkt"
+  "../common/drawing.rkt"
+  "../common/moving.rkt"
+  "../common/events.rkt"
+  "../common/sound.rkt")
 
 ;;
 ;; main entry point
