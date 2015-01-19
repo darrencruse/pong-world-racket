@@ -1,73 +1,17 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-beginner-reader.ss" "lang")((modname pong-world) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ())))
+#reader(lib "htdp-beginner-reader.ss" "lang")((modname pong-world-bsl) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ())))
+
+;; This was the original version written in a single file using BSL
+;; I consider it deprecated since I've switched to #lang racket now.
+
 (require 2htdp/universe)
 (require 2htdp/image)
 (require 2htdp/batch-io)
+(require "common/pong-sound.rkt")
 
 ;; Display debug messages to the console?
 (define SHOW-DEBUG-MSGS false)
-
-;; 
-;; To get sound effects you must manually install rsound via:
-;;
-;;   raco pkg install rsound
-;;
-;; Then you must also uncomment the appropriate section below.
-;;
-;; In addition:
-;;
-;; On Windows:  If you get an "invalid device" error when you
-;;   run the code in DrRacket, then right click on the speaker
-;;   icon (at the lower right of your desktop), choose "Playback
-;;   "Devices", then select your audio device and click the 
-;;   "Properties" button.  Finally under the Advanced tab
-;;   make sure the Sampling rate is set to 44100 Hz.
-;;
-;; On Linux: You must manually install libportaudio:
-;;   First get the latest pa tar file from:
-;;
-;;     http://www.portaudio.com/download.html
-;;
-;;   then do the following in a shell window:  
-;;     $ tar -xvf <patarfile>.tgz
-;;     $ cd portaudio
-;;     $ ./configure && make
-;;     $ sudo make install
-;;     $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
-;;     $ drracket
-;;   
-;; Lastly, uncomment the following:
-;#|
-;; FOR SOUND
-(require rsound)
-;; this duration seems ok for Mac and for PC:
-(define BOOP-DURATION-MAC-PC 3000)
-;; but sound quality on Linux is really poor on shorter durations:
-(define BOOP-DURATION-LINUX 12000)
-(define BOOP-DURATION BOOP-DURATION-MAC-PC)
-;; note rsound docs say volume is 0 to 1 but on linux
-;; and windows sound was awful at volume numbers that low
-(define BOOP-PADDLE (make-tone 360 10 BOOP-DURATION))
-(define BOOP-WALL (make-tone 260 10 BOOP-DURATION))
-(define BOOP-MISSED (make-tone 160 10 20000))
-;; Make a sound (and return true)
-(define (play-sound what)
-    ;; "play" returns void but BSL has limited support for void
-    ;; (this is just a hack that happens to return true)
-    (string? (play what)))
-;|#
-
-;; Otherwise, if the sound won't play on your hardware you
-;; disable it by leaving the code above commented and 
-;; uncommenting the following instead:
-#|
-;; FOR NO SOUND
-(define BOOP-PADDLE true)
-(define BOOP-WALL true)
-(define BOOP-MISSED true)
-(define (play-sound what) true)
-|#
 
 ;; The size of the playfield window
 ;; screen-scale = 1 is small for a laptop but fits my HP Stream 7 Windows tablet well
@@ -252,7 +196,7 @@
        (if (< y TOP)
          ;; just flip to moving down 
          ;; note I have not computed a truly accurate x intercept
-         (if (play-sound BOOP-WALL) (make-ball (make-posn x TOP)
+         (if (play-sound "wall") (make-ball (make-posn x TOP)
                     (make-direction dx (- 0 dy))
                     speed) ball)
          ball)
@@ -260,7 +204,7 @@
        (if (> y BOTTOM)
          ;; just flip to moving up 
          ;; note I have not computed a truly accurate x intercept
-         (if (play-sound BOOP-WALL) (make-ball (make-posn x BOTTOM)
+         (if (play-sound "wall") (make-ball (make-posn x BOTTOM)
                     (make-direction dx (- 0 dy))
                     speed) ball)
          ball))) 
@@ -302,7 +246,7 @@
 ;; score a point for the specified side
 ;; side is one of "left", "right"
 (define (score-a-point world side)
-  (if (play-sound BOOP-MISSED)
+  (if (play-sound "missed")
     ;; I let the player who lost the point serve next
     (if (eq? side "left")
       (make-pong-world    
@@ -342,7 +286,7 @@
          (if (and (> y (- left-paddle-y MARGIN)) (< y (+ left-paddle-y PADDLE-HEIGHT MARGIN)))
            ;; yup - just flip to moving right 
            ;; note I have not computed a truly accurate y intercept
-           (if (play-sound BOOP-PADDLE) (pong-world-set-ball world 
+           (if (play-sound "paddle") (pong-world-set-ball world 
                 (make-ball (make-posn LEFT y)
                   (make-direction (- 0 dx) (vary-dy-by-intersection left-paddle-y y))
                   (vary-speed-by-intersection speed left-paddle-y y))) world)
@@ -356,7 +300,7 @@
          (if (and (> y (- right-paddle-y MARGIN)) (< y (+ right-paddle-y PADDLE-HEIGHT MARGIN)))
            ;; yup - just flip to moving left 
            ;; note I have not computed a truly accurate y intercept
-           (if (play-sound BOOP-PADDLE) (pong-world-set-ball world 
+           (if (play-sound "paddle") (pong-world-set-ball world 
                 (make-ball (make-posn RIGHT y)
                   (make-direction (- 0 dx) (vary-dy-by-intersection right-paddle-y y))
                   (vary-speed-by-intersection speed right-paddle-y y))) world)
