@@ -1,6 +1,7 @@
 #lang whalesong
 
-;; This was the original version written in a single file using BSL 
+;; This was the original whalesong version written in a single file using BSL 
+;; I consider it deprecated since I'm using full racket features now.
 
 (require whalesong/world
          whalesong/image)
