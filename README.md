@@ -151,8 +151,8 @@ Follow the same sequence you did for the left player but give the other player's
 
 If all is well the pong game window should pop up saying "Left player serves", and you are ready to play!
 
-Run Pongsong
-------------
+Running Pongsong
+----------------
 
 Pongsong is the whalesong version of Pongworld that runs in your browser.
 
