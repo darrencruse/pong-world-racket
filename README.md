@@ -79,7 +79,7 @@ Unfortunately in this mode you have to be quite coordinated to click back and fo
 
 First you must start the server.
 
-The easiest way to run this is with two computers on your same local LAN network.  If you would like to play a friend over the internet, I've pre-installed the server on an amazon ec2 instance that I don't leave running all the time.  If you'd like to use that for your server shoot me an email and I'd be happy to fire it up for you.  In what follows I'll assume you're running the server yourself.
+The easiest way to run this is with two computers on your same local LAN network.  If you would like to play a friend over the internet, I've pre-installed the server on an amazon ec2 instance that I don't leave running all the time.  If you'd like to use that for your server shoot me an email at darren.cruse@gmail.com and I'd be happy to fire it up for you.  In what follows I'll assume you're running the server yourself.
 
 First pick a machine for your server.  Since you may not have three machines available this might be the same machines the left or right player plays on (that's fine just be clear - you only run *one* server).
 
