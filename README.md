@@ -158,7 +158,7 @@ Pongsong is the whalesong version of Pongworld that runs in your browser.
 
 It's something of a work in progress, but you can try it out here if you'd like:
 
-http://htmlpreview.github.io/?https://github.com/darrencruse/pong-world-racket/blob/master/whalesong/build/pong-world.html
+http://htmlpreview.github.io/?https://github.com/darrencruse/pong-world-racket/blob/master/pongsong/build/pong-world.html
 
 Whalesong works by converting racket source files into javascript.
 
