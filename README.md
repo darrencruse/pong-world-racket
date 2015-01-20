@@ -149,7 +149,7 @@ Follow the same sequence you did for the left player but give the other player's
     > (play-pong "rightplayersname" "right" "serveripaddress")
 ```
 
-If all is well the pong game window should pop up saying "Left player serves", and you are ready to play!
+If all is well the pong game window should pop up saying "Hit space to serve", and you are ready to play!
 
 Running Pongsong
 ----------------
