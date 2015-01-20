@@ -26,7 +26,7 @@ That original version was written in the "Beginning Student Language" for Racket
 Running Pongworld
 -----------------
 
-To run in drracket simply open the pongworld/pong-world.rkt file, click the "Run" button to evaluate the code, and then in the interactions area enter:
+To run in drracket simply open the pongworld/pong.rkt file, click the "Run" button to evaluate the code, and then in the interactions area enter:
 
 ```
     > (main initial-world)
@@ -37,7 +37,7 @@ To run from the command line enter the following in your shell:
 ```
     $ cd pongworld
     $ racket
-    > (enter! "pong-world.rkt")
+    > (enter! "pong.rkt")
     > (main initial-world)
 ```
 
@@ -83,7 +83,7 @@ The easiest way to run this is with two computers on your same local LAN network
 
 First pick a machine for your server.  Since you may not have three machines available this might be the same machines the left or right player plays on (that's fine just be clear - you only run *one* server).
 
-On the server machine in drracket you can open the pongiverse/server.rkt file, click the "Run" button to evaluate the code, and then in the interactions area enter:
+On the server machine in drracket you can open the pongiverse/pongserver.rkt file, click the "Run" button to evaluate the code, and then in the interactions area enter:
 
 ```
     > (serve-pong)
@@ -94,7 +94,7 @@ Or to do the same from the command line enter the following in your shell:
 ```
     $ cd pongiverse
     $ racket
-    > (enter! "server.rkt")
+    > (enter! "pongserver.rkt")
     > (serve-pong)
 ```
 
@@ -119,7 +119,7 @@ Now that you know your IP address you're ready to start your clients (meaning th
 
 On the machine for the left player:
 
-In drracket you can open the pongiverse/client.rkt file, click the "Run" button to evaluate the code, and then in the interactions area enter:
+In drracket you can open the pongiverse/pongclient.rkt file, click the "Run" button to evaluate the code, and then in the interactions area enter:
 
 ```
     > (play-pong "leftplayersname" "left" "serveripaddress")
@@ -133,7 +133,7 @@ If you prefer to start the client from the command line enter the following in y
 ```
     $ cd pongiverse
     $ racket
-    > (enter! "client.rkt")
+    > (enter! "pongclient.rkt")
     > (play-pong "leftplayersname" "left" "serveripaddress")
 ```
 
@@ -158,7 +158,7 @@ Pongsong is the whalesong version of Pongworld that runs in your browser.
 
 It's something of a work in progress, but you can try it out here if you'd like:
 
-http://htmlpreview.github.io/?https://github.com/darrencruse/pong-world-racket/blob/master/pongsong/build/pong-world.html
+http://htmlpreview.github.io/?https://github.com/darrencruse/pong-world-racket/blob/master/pongsong/build/pong.html
 
 Whalesong works by converting racket source files into javascript.
 
@@ -183,7 +183,7 @@ Now you can build the whalesong version of pong-world by doing:
 
 It takes a while to build, but if all goes well the resulting files wind up under pongsong/build.
 
-Now you simply bring up your favorite browser, use File->Open and open the file pongsong/build/pong-world.html.
+Now you simply bring up your favorite browser, use File->Open and open the file pongsong/build/pong.html.
 
 You should find the pong game playing in your browser (minus the nice looking "gamepad" graphics at the bottom), and minus sound.  Whalesong doesn't currently support sound, which is to say the whalesong doesn't sing, but I'm sure she will someday :).
 

@@ -20,7 +20,7 @@
 ;;
 ;; or from the command line:
 ;; $ racket
-;; > (enter! "client.rkt")
+;; > (enter! "pongclient.rkt")
 ;; > (play-pong "Darren" "left" "127.0.0.1")
 ;;
 ;; (or see run.rkt to test the game on a single machine)

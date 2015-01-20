@@ -61,7 +61,7 @@ The server is responsible for:
 ;;
 ;; or from the command line:
 ;; $ racket
-;; > (enter! "server.rkt")
+;; > (enter! "pongserver.rkt")
 ;; > (serve-pong)
 ;;
 ;; (or see run.rkt to test the game on a single machine)

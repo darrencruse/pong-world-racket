@@ -101,7 +101,7 @@
 ;;
 ;; or from the command line:
 ;; $ racket
-;; > (enter! "pong-world.rkt")
+;; > (enter! "pong-bsl.rkt")
 ;; > (main initial-world)
 ;;
 (define (main world)

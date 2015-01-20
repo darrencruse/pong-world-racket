@@ -30,8 +30,8 @@
           (play-pong PlayerNameAsAString "12.345.67.98")
 |#
 
-(require (only-in "server.rkt" serve-pong)
-         (only-in "client.rkt" play-pong)
+(require (only-in "pongserver.rkt" serve-pong)
+         (only-in "pongclient.rkt" play-pong)
          2htdp/universe)
 
 ;; launch server worlds for playtesting

@@ -1,2 +1,2 @@
 #!/bin/sh
-whalesong.rkt build --dest-dir build pong-world-bsl.rkt
+whalesong.rkt build --dest-dir build pong-bsl.rkt
