@@ -30,7 +30,7 @@
 
 (define (move-coord current dir speed)
   ;; round to hold coordinates to simple integers
-  (round (+ current (* dir speed))))
+  (inexact->exact (round (+ current (* dir speed)))))
 
 ;; Ball -> Ball
 ;; move the ball according to it's direction and speed
@@ -55,7 +55,7 @@
 
 (define (move-paddle-vert current-y dir speed)
   ;; note: we round to hold coordinates to simple integers
-  (min (max (round (+ current-y (* dir speed))) (+ TOP 2)) (- BOTTOM PADDLE-HEIGHT 2))) 
+  (min (max (inexact->exact (round (+ current-y (* dir speed)))) (+ TOP 2)) (- BOTTOM PADDLE-HEIGHT 2))) 
 
 ;; Paddle -> Paddle
 ;; move the paddle according to it's direction and speed

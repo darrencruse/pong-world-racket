@@ -1,11 +1,11 @@
 #lang whalesong
 
-(provide play-sound)
+(provide play-pong-sound)
 
 ;;
 ;; if sound won't play on your hardware you
-;; can disable it requiring this modile instead
-;; of the pong-sound one.
+;; can disable it requiring this module instead
+;; of the pong-pong-sound one.
 ;;
 
-(define (play-sound what) true)
+(define (play-pong-sound what) true)

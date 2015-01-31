@@ -1,6 +1,6 @@
 #lang racket
 
-(provide play-sound)
+(provide play-pong-sound)
 
 ;; 
 ;; To get sound effects you must manually install rsound via:
@@ -40,7 +40,7 @@
 
 ;; Make a sound (and return true)
 ;; what is one of "paddle", "wall", "missed", or "none"
-(define (play-sound what)
+(define (play-pong-sound what)
   (begin
     (cond
       ;; note rsound docs say volume is 0 to 1 but on linux
