@@ -166,7 +166,7 @@ To build the files yourself you will need to install Whalesong first - here is h
 
 ```
     $ cd 
-    $ github clone https://github.com/soegaard/whalesong.git
+    $ git clone https://github.com/soegaard/whalesong.git
     $ cd ~/Library/Racket/6.1/collects
     $ ln -s ~/whalesong/whalesong .
     $ echo "export PATH=$PATH:~/Library/Racket/6.1/collects/whalesong" >> ~/.bash_profile
