@@ -27,6 +27,9 @@ find ./pongparts/ -type f -name "*.rkt" -print0 | xargs -0 sed -i.bak "s/;;(defi
 # whalesong doesn't support the on-pad game-pad graphic at this time:
 find ./pongparts/ -type f -name "*.rkt" -print0 | xargs -0 sed -i.bak "s/define SHOW-PAD true/define SHOW-PAD false/g"
 
+# and whalesong sound differs from the rsound module we use on the desktop platforms:
+cp pongsong-sound.rkt ./pongparts/sound.rkt
+
 echo "compiling racket files to javascript..."
 whalesong.rkt build --dest-dir build ./pong.rkt
 

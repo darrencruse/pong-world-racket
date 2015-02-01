@@ -185,14 +185,12 @@ It takes a while to build, but if all goes well the resulting files wind up unde
 
 Now you simply bring up your favorite browser, use File->Open and open the file pongsong/build/pong.html.
 
-You should find the pong game playing in your browser (minus the nice looking "gamepad" graphics at the bottom), and minus sound.  Whalesong doesn't currently support sound, which is to say the whalesong doesn't sing, but I'm sure she will someday :).
-
-To enable sounds in the other versions read on...
+You should find the pong game playing in your browser (minus the "gamepad" graphics at the bottom - these are not yet available in whalesong).
 
 Enabling Sound in Pongworld and Pongiverse
 ------------------------------------------
 
-The sound effects are disabled by default, because they depend on an additional "rsound" racket library that must be separately installed.
+The sound effects are disabled by default in Pongworld and Pongiverse, because they depend on an additional "rsound" racket library that must be separately installed.
 
 To install rsound do the following from a shell window (the directory doesn't matter):
 
