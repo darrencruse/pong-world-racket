@@ -76,7 +76,7 @@
 (define PADDLE-SPEED 15)
 
 ;; What's the initial speed in pixels per tick?
-(define INITIAL-SPEED 28)
+(define INITIAL-SPEED 45)
 
 ;; What the maximum speed?
-(define MAXIMUM-SPEED 68)
+(define MAXIMUM-SPEED 90)
